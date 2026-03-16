@@ -34,7 +34,6 @@
 
     --radius: 0.5rem;
 
-    /* Mack St. custom tokens */
     --mack-cream: 36 25% 80%;
     --mack-green: 150 36% 17%;
     --mack-olive: 67 30% 42%;
@@ -58,10 +57,14 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Instrument Sans', sans-serif;
+    font-family: 'Poppins', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 }
