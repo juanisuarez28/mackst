@@ -16,22 +16,35 @@ const Inicio = () => {
       {/* Misión & Visión */}
       <section className="bg-primary px-6 md:px-12 py-20 md:py-32">
         <div className="max-w-[1400px] w-full mx-auto">
-          <h2
-            className="font-heading font-bold text-primary-foreground leading-[0.85] tracking-tight mb-12 md:mb-20"
-            style={{ fontSize: "clamp(2.5rem, 8vw, 6rem)" }}
-          >
-            Misión &<br />visión.
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8 md:gap-12">
-            <p className="font-body text-sm md:text-base text-primary-foreground/80 leading-relaxed">
-              Nuestra misión es impulsar el crecimiento de las empresas del sector agroindustrial a través de estrategias de comunicación y marketing que generen valor, conecten con sus audiencias y fortalezcan su posicionamiento en el mercado.
-            </p>
-            <p className="font-body text-sm md:text-base text-primary-foreground/80 leading-relaxed">
-              Creemos en el poder de la comunicación estratégica como herramienta transformadora. Trabajamos junto a nuestros clientes para construir narrativas auténticas que reflejen su identidad y los diferencien en un mercado cada vez más competitivo.
-            </p>
-            <p className="font-body text-sm md:text-base text-primary-foreground/80 leading-relaxed">
-              Nuestra visión es ser la consultora líder en agromarketing de la región, reconocida por nuestra creatividad, innovación y compromiso con los resultados. Aspiramos a ser el socio estratégico de referencia para las marcas del agro.
-            </p>
+          <div className="grid md:grid-cols-2 gap-12 md:gap-20">
+            <div className="flex flex-col gap-4">
+              <h2
+                className="font-heading font-bold text-primary-foreground leading-[0.85] tracking-tight mb-4"
+                style={{ fontSize: "clamp(2.5rem, 8vw, 5rem)" }}
+              >
+                Misión.
+              </h2>
+              <p className="font-body text-sm md:text-base text-primary-foreground/80 leading-relaxed">
+                En Mack Studio acompañamos a las marcas del agro y otros sectores a comunicar con autenticidad, contando la historia que hay detrás de cada proyecto.
+              </p>
+              <p className="font-body text-sm md:text-base text-primary-foreground/80 leading-relaxed">
+                Nuestra misión es crear estrategias creativas y efectivas, combinando comunicación, marketing y diseño con un profundo conocimiento técnico del campo, para lograr que cada empresa conecte de manera real con su audiencia.
+              </p>
+            </div>
+            <div className="flex flex-col gap-4">
+              <h2
+                className="font-heading font-bold text-primary-foreground leading-[0.85] tracking-tight mb-4"
+                style={{ fontSize: "clamp(2.5rem, 8vw, 5rem)" }}
+              >
+                Visión.
+              </h2>
+              <p className="font-body text-sm md:text-base text-primary-foreground/80 leading-relaxed">
+                Ser la agencia de agromarketing y comunicación líder, reconocida por dar voz a quienes producen y por transformar el esfuerzo de las empresas en marcas sólidas, cercanas e innovadoras.
+              </p>
+              <p className="font-body text-sm md:text-base text-primary-foreground/80 leading-relaxed">
+                Queremos consolidarnos como un aliado estratégico del sector agropecuario, llevando la comunicación a un nivel más humano, técnico y creativo, que inspire confianza y crecimiento sostenido.
+              </p>
+            </div>
           </div>
         </div>
       </section>

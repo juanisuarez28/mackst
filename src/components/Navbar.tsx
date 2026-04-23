@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 const navItems = [
   { label: "INICIO", target: "inicio" },
   { label: "NOSOTROS", target: "nosotros" },
+  { label: "CLIENTES", target: "clientes" },
   { label: "SERVICIOS", target: "servicios" },
   { label: "CONTACTO", target: "contacto" },
 ];
@@ -11,19 +12,27 @@ const navItems = [
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("inicio");
-  const [scrolled, setScrolled] = useState(false);
+  const [theme, setTheme] = useState("light"); // "light" or "dark" based on background
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+    // Escuchar el cambio de tema emitido por CylinderScroll
+    const handleThemeChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setTheme(customEvent.detail);
+    };
 
+    window.addEventListener("theme-change", handleThemeChange);
+    
+    // Fallback scroll listener just to update activeSection based on offset top
+    // Since we now use anchors that have native offsetTop, this will still work!
+    const handleScroll = () => {
       const sections = navItems.map((item) => {
         const el = document.getElementById(item.target);
         if (!el) return { id: item.target, top: 0 };
         return { id: item.target, top: el.offsetTop };
       });
 
-      const scrollPos = window.scrollY + 200;
+      const scrollPos = window.scrollY + window.innerHeight / 2; // Mid screen
       for (let i = sections.length - 1; i >= 0; i--) {
         if (scrollPos >= sections[i].top) {
           setActiveSection(sections[i].id);
@@ -33,7 +42,10 @@ const Navbar = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("theme-change", handleThemeChange);
+    };
   }, []);
 
   const scrollTo = (id: string) => {
@@ -44,16 +56,21 @@ const Navbar = () => {
     setMobileOpen(false);
   };
 
+  // Determine colors based on theme
+  const textColorClass = theme === "dark" ? "text-secondary" : "text-primary";
+  const hoverTextColorClass = theme === "dark" ? "hover:text-white" : "hover:text-primary/70";
+  const activeBgClass = theme === "dark" ? "bg-secondary text-secondary-foreground" : "bg-primary text-primary-foreground";
+  const logoSubColor = theme === "dark" ? "#e0e7c8" : "#8f9d67"; // Lighter green for dark bg
+
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 transition-all duration-300 ${
-        scrolled ? "bg-background/90 backdrop-blur-md shadow-sm" : ""
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 transition-all duration-500 bg-transparent`}
     >
       <div className="flex items-center justify-between">
         <button onClick={() => scrollTo("inicio")} className="z-50">
-          <span className="text-xl font-bold tracking-tight text-primary" style={{ fontFamily: "'Poppins', sans-serif" }}>
-            <span className="font-bold">mack</span> <span className="font-bold">st.</span>
+          <span className={`text-xl font-black tracking-tighter flex items-start transition-colors duration-500 ${textColorClass}`} style={{ fontFamily: "'Poppins', sans-serif" }}>
+            <span className="font-[900]">mack</span>
+            <span className="text-[0.6em] font-black ml-0.5 mt-[0.1em] transition-colors duration-500" style={{ color: logoSubColor }}>st.</span>
           </span>
         </button>
 
@@ -62,10 +79,10 @@ const Navbar = () => {
             <button
               key={item.target}
               onClick={() => scrollTo(item.target)}
-              className={`text-xs tracking-[0.15em] font-medium px-5 py-2 rounded-full transition-all duration-300 ${
+              className={`text-xs tracking-[0.15em] font-medium px-5 py-2 rounded-full transition-all duration-500 ${
                 activeSection === item.target
-                  ? "bg-primary text-primary-foreground"
-                  : "text-primary/70 hover:text-primary"
+                  ? activeBgClass
+                  : `${textColorClass} ${hoverTextColorClass} opacity-80 hover:opacity-100`
               }`}
             >
               {item.label}
@@ -75,7 +92,7 @@ const Navbar = () => {
 
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden z-50 text-primary"
+          className={`md:hidden z-50 transition-colors duration-500 ${textColorClass}`}
         >
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>

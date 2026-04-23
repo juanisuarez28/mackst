@@ -1,41 +1,66 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const clients = Array.from({ length: 8 }, (_, i) => ({
   name: `Cliente ${i + 1}`,
 }));
 
 const ClientCarousel = () => {
-  const [offset, setOffset] = useState(0);
-  const visibleCount = 4;
-  const maxOffset = Math.max(0, clients.length - visibleCount);
+  const [index, setIndex] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(2);
 
-  const prev = () => setOffset((o) => Math.max(0, o - 1));
-  const next = () => setOffset((o) => Math.min(maxOffset, o + 1));
+  // Responsive: 2 on mobile, 4 on desktop
+  useEffect(() => {
+    const update = () =>
+      setVisibleCount(window.innerWidth >= 768 ? 4 : 2);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const maxIndex = clients.length - visibleCount;
+
+  const next = useCallback(() => {
+    setIndex((i) => (i >= maxIndex ? 0 : i + 1));
+  }, [maxIndex]);
+
+  const prev = () => setIndex((i) => (i <= 0 ? maxIndex : i - 1));
+
+  // Auto-advance every 2 seconds
+  useEffect(() => {
+    const timer = setInterval(next, 2000);
+    return () => clearInterval(timer);
+  }, [next]);
+
+  const slideWidth = 100 / visibleCount;
 
   return (
-    <div className="relative flex items-center gap-4">
+    <div className="relative flex items-center gap-2 md:gap-4 w-full">
       <button
         onClick={prev}
-        disabled={offset === 0}
-        className="text-primary-foreground/60 hover:text-primary-foreground disabled:opacity-30 transition-opacity shrink-0"
+        className="text-primary-foreground/60 hover:text-primary-foreground transition-opacity shrink-0"
+        aria-label="Anterior"
       >
-        <ChevronLeft size={32} />
+        <ChevronLeft size={28} />
       </button>
 
       <div className="overflow-hidden flex-1">
         <div
-          className="flex gap-8 transition-transform duration-500 ease-out"
-          style={{ transform: `translateX(-${offset * (100 / visibleCount)}%)` }}
+          className="flex transition-transform duration-500 ease-out"
+          style={{ transform: `translateX(-${index * slideWidth}%)` }}
         >
           {clients.map((client, i) => (
             <div
               key={i}
-              className="shrink-0 flex flex-col items-center"
-              style={{ width: `calc(${100 / visibleCount}% - ${(visibleCount - 1) * 8 / visibleCount}px * ${visibleCount})` }}
+              className="shrink-0 px-2 md:px-4"
+              style={{ width: `${slideWidth}%` }}
             >
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-primary-foreground/15 border-2 border-primary-foreground/20 flex items-center justify-center">
-                <span className="text-primary-foreground/40 text-xs font-medium">LOGO</span>
+              <div className="flex flex-col items-center">
+                <div className="w-24 h-24 md:w-36 md:h-36 rounded-full bg-primary-foreground/15 border-2 border-primary-foreground/20 flex items-center justify-center mx-auto">
+                  <span className="text-primary-foreground/40 text-xs font-medium">
+                    LOGO
+                  </span>
+                </div>
               </div>
             </div>
           ))}
@@ -44,10 +69,10 @@ const ClientCarousel = () => {
 
       <button
         onClick={next}
-        disabled={offset >= maxOffset}
-        className="text-primary-foreground/60 hover:text-primary-foreground disabled:opacity-30 transition-opacity shrink-0"
+        className="text-primary-foreground/60 hover:text-primary-foreground transition-opacity shrink-0"
+        aria-label="Siguiente"
       >
-        <ChevronRight size={32} />
+        <ChevronRight size={28} />
       </button>
     </div>
   );
