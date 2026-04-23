@@ -106,9 +106,31 @@ const ServicesStack: React.FC = () => {
         }}
         className="bg-background flex items-center"
       >
-        <div className="w-full h-full flex items-center px-6 md:px-12 max-w-[1400px] mx-auto">
-          {/* Left: Card Stack */}
-          <div className="flex-1 relative flex items-center justify-center h-full">
+        <div className="w-full h-full relative flex flex-col md:flex-row items-center px-6 md:px-12 max-w-[1400px] mx-auto">
+          {/* Title - Fixed at top on mobile, static on desktop */}
+          <div className="absolute top-0 left-0 w-full pt-28 px-6 pb-6 md:static md:w-[38%] md:pt-0 md:px-0 md:pb-0 flex flex-col justify-center items-start md:pl-8 select-none z-[100] bg-gradient-to-b from-background/80 to-transparent md:bg-none">
+            <p className="text-[14px] md:text-[25px] tracking-[0.3em] text-mack-olive/60 uppercase mb-1 md:mb-4 font-bold">Nuestros</p>
+            <h2
+              className="font-black text-gray-900 leading-[0.82] tracking-tighter"
+              style={{ fontSize: "clamp(2.5rem, 8vw, 6.5rem)" }}
+            >
+              servicios.
+            </h2>
+            {/* Scroll indicator - only on desktop */}
+            <div className="hidden md:flex mt-10 flex-col gap-2">
+              {services.map((_, i) => (
+                <ProgressDot
+                  key={i}
+                  index={i}
+                  total={n}
+                  scrollYProgress={scrollYProgress}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Card Stack */}
+          <div className="flex-1 w-full relative flex items-center justify-center h-full pt-20 md:pt-0">
             {services.map((service, i) => (
               <ServiceCard
                 key={i}
@@ -119,28 +141,6 @@ const ServicesStack: React.FC = () => {
                 accent={cardAccents[i]}
               />
             ))}
-          </div>
-
-          {/* Right: Title */}
-          <div className="hidden md:flex w-[38%] flex-col justify-center items-start pl-8 select-none pointer-events-none">
-            <p className="text-[25px] tracking-[0.3em] text-foreground/40 uppercase mb-4">Nuestros</p>
-            <h2
-              className="font-black text-foreground leading-[0.82] tracking-tighter"
-              style={{ fontSize: "clamp(3rem, 7vw, 6.5rem)" }}
-            >
-              servicios.
-            </h2>
-            {/* Scroll indicator */}
-            <div className="mt-10 flex flex-col gap-2">
-              {services.map((_, i) => (
-                <ProgressDot
-                  key={i}
-                  index={i}
-                  total={n}
-                  scrollYProgress={scrollYProgress}
-                />
-              ))}
-            </div>
           </div>
         </div>
       </div>
@@ -203,7 +203,8 @@ const ServiceCard: React.FC<{
     if (val < p - step * 0.5) {
       // Below: coming in from bottom
       const ratio = (p - val - step * 0.5) / (step * 0.5);
-      return `${Math.min(ratio * 110, 110)}vh`;
+      const isMobile = window.innerWidth < 768;
+      return `${Math.min(ratio * 120, isMobile ? 120 : 110)}vh`;
     }
     if (val >= p && val < 1) {
       // Stacked: how many cards are on top?

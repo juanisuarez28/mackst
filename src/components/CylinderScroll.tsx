@@ -120,52 +120,48 @@ const ContentLayer = ({
   total: number;
   index: number;
 }) => {
-  const fadeWidth = d * 0.45;
+  const fadeWidth = d * 0.15;
   const isFirst = index === 0;
   const isLast = index === total - 1;
 
   // Animation values for normal mode
   const normalOpacity = useTransform(scrollYProgress, (val) => {
-    if (isFirst) {
-      // Fully visible at start, fade out linearly from halfway through the section
-      const fadeStart = p + d * 0.5;
-      const fadeEnd = fadeStart + fadeWidth;
-      if (val <= fadeStart) return 1;
-      if (val >= fadeEnd) return 0;
-      return 1 - (val - fadeStart) / fadeWidth;
-    }
-    if (isLast) {
-      // Fade in linearly before halfway through the section, fully visible at end
-      const fadeEnd = p + d * 0.5;
-      const fadeStart = fadeEnd - fadeWidth;
-      if (val >= fadeEnd) return 1;
-      if (val <= fadeStart) return 0;
-      return (val - fadeStart) / fadeWidth;
-    }
-    // Normal: center-based symmetric fade
     const center = p + d / 2;
+    const plateauHalf = d * 0.35;
+    const transitionWidth = d * 0.15;
+    
+    if (isFirst && val <= center) return 1;
+    if (isLast && val >= center) return 1;
+
     const distance = Math.abs(val - center);
-    if (distance > fadeWidth) return 0;
-    return 1 - (distance / fadeWidth);
+    
+    if (distance <= plateauHalf) return 1;
+    if (distance > plateauHalf + transitionWidth) return 0;
+    
+    return 1 - (distance - plateauHalf) / transitionWidth;
   });
 
   const normalTranslateY = useTransform(scrollYProgress, (val) => {
-    if (isFirst) {
-      const fadeStart = p + d * 0.5;
-      if (val <= fadeStart) return "0vh";
-      const ratio = (val - fadeStart) / fadeWidth;
-      return `${Math.min(ratio, 1) * -6}vh`;
-    }
-    if (isLast) {
-      const fadeEnd = p + d * 0.5;
-      if (val >= fadeEnd) return "0vh";
-      const ratio = (fadeEnd - val) / fadeWidth;
-      return `${Math.min(ratio, 1) * 6}vh`;
-    }
     const center = p + d / 2;
-    const diff = val - center;
-    const ratio = diff / fadeWidth;
-    return `${ratio * -8}vh`;
+    const plateauHalf = d * 0.35;
+    const transitionWidth = d * 0.15;
+
+    if (isFirst && val <= center) return "0vh";
+    if (isLast && val >= center) return "0vh";
+
+    if (val < center - plateauHalf) {
+      // Coming in from below
+      const diff = (center - plateauHalf) - val;
+      const ratio = Math.min(diff / transitionWidth, 1);
+      return `${ratio * 8}vh`;
+    }
+    if (val > center + plateauHalf) {
+      // Going out to top
+      const diff = val - (center + plateauHalf);
+      const ratio = Math.min(diff / transitionWidth, 1);
+      return `${ratio * -8}vh`;
+    }
+    return "0vh";
   });
 
   // Animation values for STACK mode

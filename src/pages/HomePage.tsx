@@ -1,5 +1,6 @@
-import { useState, useRef } from "react";
-import { Linkedin, Instagram, Send, X } from "lucide-react";
+import { Linkedin, Instagram, Send, X, ArrowUp } from "lucide-react";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
 
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -105,7 +106,20 @@ const cardAccents = [
 const HomePage = () => {
   const [selectedMember, setSelectedMember] = useState<number | null>(null);
   const [modalPos, setModalPos] = useState<{ x: number; y: number; mobile: boolean } | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleCardEnter = (i: number, e: React.MouseEvent<HTMLDivElement>) => {
     if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
@@ -177,7 +191,7 @@ const HomePage = () => {
     {
       bgColorClass: "bg-primary",
       bgImage: "url('/fondo_verde_oscuro_mack.png')",
-      scrollWeight: 2,
+      scrollWeight: typeof window !== "undefined" && window.innerWidth < 768 ? 1 : 1.2,
       content: (
         <div className="w-full px-6 md:px-12 py-20 md:py-32 flex flex-col justify-center items-center">
           <div className="max-w-[1400px] w-full mx-auto">
@@ -219,7 +233,7 @@ const HomePage = () => {
       id: "nosotros",
       bgColorClass: "bg-secondary",
       bgImage: "url('/fondo_verde_claro_mack.png')",
-      scrollWeight: 2,
+      scrollWeight: 1.2,
       content: (
         <div id="nosotros" className="w-full h-full flex flex-col justify-center items-center px-6 md:px-12 py-20">
           <div className="max-w-[1400px] w-full mx-auto">
@@ -260,7 +274,7 @@ const HomePage = () => {
       id: "clientes",
       bgColorClass: "bg-primary",
       bgImage: "url('/fondo_verde_oscuro_mack.png')",
-      scrollWeight: 2,
+      scrollWeight: 1.2,
       content: (
         <div className="w-full px-6 md:px-12 flex flex-col justify-center items-center h-full">
           <div className="max-w-[1400px] w-full mx-auto">
@@ -290,7 +304,7 @@ const HomePage = () => {
     {
       bgColorClass: "bg-primary",
       bgImage: "url('/fondo_verde_oscuro_mack.png')",
-      scrollWeight: 2,
+      scrollWeight: 1.2,
       content: (
         <div className="w-full px-6 md:px-12 flex flex-col justify-center items-center h-full">
           <div className="max-w-[1400px] w-full mx-auto">
@@ -313,7 +327,7 @@ const HomePage = () => {
       bgColorClass: "bg-background",
       bgImage: "url('/fondo_claro_mack.png')",
       isStack: true,
-      scrollWeight: 0.6, // Higher density for services
+      scrollWeight: 0.5, // Faster stacking for services
       content: (
         <div className="w-full h-full flex items-center px-6 md:px-12 max-w-[1400px] mx-auto overflow-hidden">
           {/* Card Container (Always stays at flex-1 to occupy 62% if title exists or same space if not) */}
@@ -350,14 +364,13 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Sticky Title Column: Always render this div to maintain alignment, but only show text on first section */}
-          <div className="hidden md:flex w-[38%] flex-col justify-center items-start pl-8 select-none pointer-events-none">
+          {/* Desktop Title Column - remains as is */}
+          <div className="hidden md:flex w-[38%] flex-col justify-center items-start md:pl-8 select-none pointer-events-none">
             {i === 0 && (
               <>
-                <p className="text-2xl tracking-[0.3em] text-foreground/40 uppercase mb-4">Nuestros</p>
+                <p className="text-[25px] tracking-[0.3em] text-foreground/40 uppercase mb-4">Nuestros</p>
                 <h2
-                  className="font-black text-foreground leading-[0.82] tracking-tighter"
-                  style={{ fontSize: "clamp(3rem, 7vw, 6.5rem)" }}
+                  className="font-black text-foreground leading-[0.82] tracking-tighter text-[6.5rem]"
                 >
                   servicios.
                 </h2>
@@ -471,10 +484,10 @@ const HomePage = () => {
             <div
               className="rounded-3xl overflow-hidden relative"
               style={{
-                background: "rgba(15, 22, 10, 0.93)",
-                backdropFilter: "blur(36px) saturate(160%)",
-                border: "1px solid rgba(143, 157, 103, 0.22)",
-                boxShadow: "0 28px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.07)",
+                background: "rgba(143, 157, 103, 0.98)", // Mack Olive
+                backdropFilter: "blur(40px) saturate(180%)",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                boxShadow: "0 28px 70px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
                 pointerEvents: "auto",
               }}
               onMouseEnter={handleModalEnter}
@@ -484,7 +497,7 @@ const HomePage = () => {
               {modalPos.mobile && (
                 <button
                   onClick={closeModal}
-                  className="absolute top-3 right-3 z-20 w-7 h-7 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all"
+                  className="absolute top-3 right-3 z-20 w-7 h-7 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 text-black/50 hover:text-black transition-all"
                   aria-label="Cerrar"
                 >
                   <X size={14} />
@@ -502,16 +515,15 @@ const HomePage = () => {
                     className="absolute inset-0"
                     style={{
                       background: modalPos.mobile
-                        ? "linear-gradient(to bottom, transparent 55%, rgba(15,22,10,0.7))"
-                        : "linear-gradient(to right, transparent 55%, rgba(15,22,10,0.55))",
+                        ? "linear-gradient(to bottom, transparent 55%, rgba(143, 157, 103, 0.6))"
+                        : "linear-gradient(to right, transparent 55%, rgba(143, 157, 103, 0.5))",
                     }}
                   />
                 </div>
                 {/* Info */}
                 <div className="flex-1 p-5 md:p-6 flex flex-col justify-center">
                   <p
-                    className="text-[10px] font-bold tracking-[0.3em] uppercase mb-2"
-                    style={{ color: "#8f9d67" }}
+                    className="text-[10px] font-bold tracking-[0.3em] uppercase mb-2 text-black/40"
                   >
                     {teamMembers[selectedMember].role}
                   </p>
@@ -519,9 +531,9 @@ const HomePage = () => {
                     {teamMembers[selectedMember].name}
                   </h3>
                   <div
-                    style={{ width: "32px", height: "2px", background: "#8f9d67", borderRadius: "2px", margin: "10px 0" }}
+                    style={{ width: "32px", height: "2px", background: "rgba(0,0,0,0.2)", borderRadius: "2px", margin: "10px 0" }}
                   />
-                  <p className="text-xs text-white/65 leading-relaxed whitespace-pre-line">
+                  <p className="text-xs text-black/70 leading-relaxed whitespace-pre-line">
                     {teamMembers[selectedMember].bio}
                   </p>
                 </div>
@@ -530,7 +542,46 @@ const HomePage = () => {
           </div>
         </>
       )}
+
+      {/* Mobile Services Title (Fixed, single instance) */}
+      <ServicesMobileTitle />
+
+      {/* Scroll to top button */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 20 }}
+            onClick={scrollToTop}
+            className="fixed bottom-8 right-8 z-[80] w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-mack-olive shadow-xl hover:bg-white/20 transition-colors"
+            aria-label="Subir"
+          >
+            <ArrowUp size={24} />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
+  );
+};
+
+const ServicesMobileTitle = () => {
+  const { scrollYProgress } = useScroll();
+  // Services start after ~60% of the page
+  // We'll fade it in/out precisely for the services block
+  const opacity = useTransform(scrollYProgress, [0.52, 0.55, 0.92, 0.98], [0, 1, 1, 0]);
+  const y = useTransform(scrollYProgress, [0.52, 0.55], [10, 0]);
+
+  return (
+    <motion.div
+      style={{ opacity, y }}
+      className="md:hidden fixed top-20 left-0 w-full z-[70] flex flex-col items-center pointer-events-none text-center"
+    >
+      <p className="text-[14px] tracking-[0.3em] text-foreground/40 uppercase mb-1 font-bold">Nuestros</p>
+      <h2 className="font-black text-gray-900 leading-[0.82] tracking-tighter text-4xl">
+        servicios.
+      </h2>
+    </motion.div>
   );
 };
 
