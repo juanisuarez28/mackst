@@ -191,7 +191,7 @@ const HomePage = () => {
     {
       bgColorClass: "bg-primary",
       bgImage: "url('/fondo_verde_oscuro_mack.png')",
-      scrollWeight: typeof window !== "undefined" && window.innerWidth < 768 ? 1 : 1.2,
+      scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
       content: (
         <div className="w-full px-6 md:px-12 py-20 md:py-32 flex flex-col justify-center items-center">
           <div className="max-w-[1400px] w-full mx-auto">
@@ -233,7 +233,7 @@ const HomePage = () => {
       id: "nosotros",
       bgColorClass: "bg-secondary",
       bgImage: "url('/fondo_verde_claro_mack.png')",
-      scrollWeight: 1.2,
+      scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
       content: (
         <div id="nosotros" className="w-full h-full flex flex-col justify-center items-center px-6 md:px-12 py-20">
           <div className="max-w-[1400px] w-full mx-auto">
@@ -274,7 +274,7 @@ const HomePage = () => {
       id: "clientes",
       bgColorClass: "bg-primary",
       bgImage: "url('/fondo_verde_oscuro_mack.png')",
-      scrollWeight: 1.2,
+      scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
       content: (
         <div className="w-full px-6 md:px-12 flex flex-col justify-center items-center h-full">
           <div className="max-w-[1400px] w-full mx-auto">
@@ -304,7 +304,7 @@ const HomePage = () => {
     {
       bgColorClass: "bg-primary",
       bgImage: "url('/fondo_verde_oscuro_mack.png')",
-      scrollWeight: 1.2,
+      scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
       content: (
         <div className="w-full px-6 md:px-12 flex flex-col justify-center items-center h-full">
           <div className="max-w-[1400px] w-full mx-auto">
