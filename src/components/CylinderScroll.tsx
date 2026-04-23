@@ -282,6 +282,7 @@ export const CylinderScroll: React.FC<StickyScrollProps> = ({ sections }) => {
       const isDark = activeSection.bgColorClass?.includes("bg-primary") || activeSection.bgColorClass?.includes("bg-secondary");
       const theme = isDark ? "dark" : "light";
       window.dispatchEvent(new CustomEvent("theme-change", { detail: theme }));
+      window.dispatchEvent(new CustomEvent("section-change", { detail: activeSection.id || `section-${finalIndex}` }));
     }
   });
 

@@ -189,6 +189,7 @@ const HomePage = () => {
       ),
     },
     {
+      id: "mision",
       bgColorClass: "bg-primary",
       bgImage: "url('/fondo_verde_oscuro_mack.png')",
       scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
@@ -302,6 +303,7 @@ const HomePage = () => {
       ),
     },
     {
+      id: "testimonios",
       bgColorClass: "bg-primary",
       bgImage: "url('/fondo_verde_oscuro_mack.png')",
       scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
@@ -323,7 +325,7 @@ const HomePage = () => {
     },
     // SERVICES STACKED SECTIONS
     ...servicesData.map((service, i) => ({
-      id: i === 0 ? "servicios" : undefined,
+      id: i === 0 ? "servicios" : `servicios-${i}`,
       bgColorClass: "bg-background",
       bgImage: "url('/fondo_claro_mack.png')",
       isStack: true,
@@ -566,22 +568,37 @@ const HomePage = () => {
 };
 
 const ServicesMobileTitle = () => {
-  const { scrollYProgress } = useScroll();
-  // Services start after ~60% of the page
-  // We'll fade it in/out precisely for the services block
-  const opacity = useTransform(scrollYProgress, [0.52, 0.55, 0.92, 0.98], [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, [0.52, 0.55], [10, 0]);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const sectionId = (e as CustomEvent).detail as string;
+      // Show when we're in any service stack section
+      // Services have id "servicios" (first) or "section-N" for the rest
+      const isServices = sectionId === "servicios" || sectionId.startsWith("servicios-");
+      setVisible(isServices);
+    };
+    window.addEventListener("section-change", handler);
+    return () => window.removeEventListener("section-change", handler);
+  }, []);
 
   return (
-    <motion.div
-      style={{ opacity, y }}
-      className="md:hidden fixed top-20 left-0 w-full z-[70] flex flex-col items-center pointer-events-none text-center"
-    >
-      <p className="text-[14px] tracking-[0.3em] text-foreground/40 uppercase mb-1 font-bold">Nuestros</p>
-      <h2 className="font-black text-gray-900 leading-[0.82] tracking-tighter text-4xl">
-        servicios.
-      </h2>
-    </motion.div>
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.25 }}
+          className="md:hidden fixed top-20 left-0 w-full z-[70] flex flex-col items-center pointer-events-none text-center"
+        >
+          <p className="text-[14px] tracking-[0.3em] text-foreground/40 uppercase mb-1 font-bold">Nuestros</p>
+          <h2 className="font-black text-gray-900 leading-[0.82] tracking-tighter text-4xl">
+            servicios.
+          </h2>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
