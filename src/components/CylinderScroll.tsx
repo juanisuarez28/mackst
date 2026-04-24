@@ -8,6 +8,7 @@ export interface StickySection {
   content: React.ReactNode;
   isStack?: boolean;
   scrollWeight?: number; // New: allows a section to take more or less scroll distance (default 1)
+  theme?: "light" | "dark";
 }
 
 interface StickyScrollProps {
@@ -279,8 +280,11 @@ export const CylinderScroll: React.FC<StickyScrollProps> = ({ sections }) => {
     
     const activeSection = sections[finalIndex];
     if (activeSection) {
-      const isDark = activeSection.bgColorClass?.includes("bg-primary") || activeSection.bgColorClass?.includes("bg-secondary");
-      const theme = isDark ? "dark" : "light";
+      let theme = activeSection.theme;
+      if (!theme) {
+        const isDark = activeSection.bgColorClass?.includes("bg-primary") || activeSection.bgColorClass?.includes("bg-secondary");
+        theme = isDark ? "dark" : "light";
+      }
       window.dispatchEvent(new CustomEvent("theme-change", { detail: theme }));
       window.dispatchEvent(new CustomEvent("section-change", { detail: activeSection.id || `section-${finalIndex}` }));
     }

@@ -60,18 +60,17 @@ const Navbar = () => {
   const textColorClass = theme === "dark" ? "text-secondary" : "text-primary";
   const hoverTextColorClass = theme === "dark" ? "hover:text-white" : "hover:text-primary/70";
   const activeBgClass = theme === "dark" ? "bg-secondary text-secondary-foreground" : "bg-primary text-primary-foreground";
-  const logoSubColor = theme === "dark" ? "#e0e7c8" : "#8f9d67"; // Lighter green for dark bg
-
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 transition-all duration-500 bg-transparent`}
     >
       <div className="flex items-center justify-between">
         <button onClick={() => scrollTo("inicio")} className="z-50">
-          <span className={`text-xl font-black tracking-tighter flex items-start transition-colors duration-500 ${textColorClass}`} style={{ fontFamily: "'Poppins', sans-serif" }}>
-            <span className="font-[900]">mack</span>
-            <span className="text-[0.6em] font-black ml-0.5 mt-[0.1em] transition-colors duration-500" style={{ color: logoSubColor }}>st.</span>
-          </span>
+          <img 
+            src={theme === "dark" ? "/Logo-Light-Green-03.svg" : "/Logo-Dark-Green-03.svg"} 
+            alt="Mack Studio" 
+            className="h-8 md:h-10 w-auto object-contain transition-all duration-500"
+          />
         </button>
 
         <div className="hidden md:flex items-center gap-1">

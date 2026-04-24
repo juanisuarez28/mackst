@@ -161,18 +161,14 @@ const HomePage = () => {
         <div id="inicio" className="w-full px-6 md:px-12 pt-24 pb-16 flex flex-col justify-center items-center">
           <div className="max-w-[1400px] w-full mx-auto">
             <ScrollReveal>
-              <h1
-                className="font-black text-foreground leading-[0.8] tracking-tighter flex items-start"
-                style={{ fontSize: "clamp(4rem, 12vw, 10rem)" }}
-              >
-                <span className="font-[900]">mack</span>
-                <span className="text-[0.35em] font-black ml-1 mt-[0.15em]" style={{ color: "#8f9d67" }}>st.</span>
-              </h1>
-            </ScrollReveal>
-            <ScrollReveal delay={0.1}>
-              <p className="text-xl md:text-3xl text-foreground mt-4 font-medium">
-                Agromarketing & Comunicación
-              </p>
+              <img
+                src="/Logo-DarkGreen-01.svg"
+                alt="Mack Studio"
+                className="w-auto object-contain -ml-1"
+                style={{
+                  height: "clamp(5rem, 16vw, 13rem)",
+                }}
+              />
             </ScrollReveal>
             <ScrollReveal delay={0.2}>
               <p className="text-sm md:text-lg text-foreground/80 mt-8 max-w-2xl leading-relaxed">
@@ -234,6 +230,7 @@ const HomePage = () => {
       id: "nosotros",
       bgColorClass: "bg-secondary",
       bgImage: "url('/fondo_verde_claro_mack.png')",
+      theme: "light",
       scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
       content: (
         <div id="nosotros" className="w-full h-full flex flex-col justify-center items-center px-6 md:px-12 py-20">
