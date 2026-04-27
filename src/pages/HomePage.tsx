@@ -394,7 +394,7 @@ const HomePage = () => {
       content: (
         <div className="w-full h-full flex flex-col items-center justify-center px-6 md:px-12">
           {i === 0 && (
-            <div className="absolute top-[24%] md:top-[15%] left-0 w-full px-6 md:px-12 pointer-events-none mb-12">
+            <div className="absolute top-[20%] md:top-[15%] left-0 w-full px-6 md:px-12 pointer-events-none mb-12">
               <div className="max-w-[1400px] w-full mx-auto">
                 <h2
                   className="font-bold text-secondary-foreground leading-[0.85] tracking-tight"
@@ -405,7 +405,7 @@ const HomePage = () => {
               </div>
             </div>
           )}
-          <div className="max-w-xl w-full mx-auto relative z-10 mt-32 md:mt-40">
+          <div className="max-w-xl w-full mx-auto relative z-10 mt-48 md:mt-40">
             {/* Logo superpuesto rectangular */}
             <div className="absolute left-1/2 -top-12 -translate-x-1/2 w-48 h-24 bg-white rounded-2xl shadow-sm flex items-center justify-center z-20 overflow-hidden px-4">
               {t.logo ? (
@@ -442,7 +442,7 @@ const HomePage = () => {
       id: "servicios",
       bgColorClass: "bg-background",
       bgImage: "url('/fondo_claro_mack.png')",
-      scrollWeight: typeof window !== "undefined" && window.innerWidth < 768 ? 1.2 : 0.8,
+      scrollWeight: typeof window !== "undefined" && window.innerWidth < 768 ? 1.5 : 0.8,
       content: <ServicesSectionContent index={4 + testimonials.length} setSelectedService={setSelectedService} />,
     },
     // CONTACT SECTION
