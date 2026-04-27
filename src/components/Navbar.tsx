@@ -57,9 +57,9 @@ const Navbar = () => {
   };
 
   // Determine colors based on theme
-  const textColorClass = theme === "dark" ? "text-secondary" : "text-primary";
+  const textColorClass = theme === "dark" ? "text-mack-cream" : "text-primary";
   const hoverTextColorClass = theme === "dark" ? "hover:text-white" : "hover:text-primary/70";
-  const activeBgClass = theme === "dark" ? "bg-secondary text-secondary-foreground" : "bg-primary text-primary-foreground";
+  const activeBgClass = theme === "dark" ? "bg-mack-cream text-primary" : "bg-primary text-primary-foreground";
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 transition-all duration-500 bg-transparent`}
@@ -67,7 +67,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between">
         <button onClick={() => scrollTo("inicio")} className="z-50">
           <img 
-            src={theme === "dark" ? "/Logo-Light-Green-03.svg" : "/Logo-Dark-Green-03.svg"} 
+            src={theme === "dark" ? "/Logo-Beige-03.svg" : "/Logo-Dark-Green-03.svg"} 
             alt="Mack Studio" 
             className="h-8 md:h-10 w-auto object-contain transition-all duration-500"
           />

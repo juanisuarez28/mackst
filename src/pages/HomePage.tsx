@@ -1,43 +1,48 @@
-import { Linkedin, Instagram, Send, X, ArrowUp } from "lucide-react";
+import { Linkedin, Instagram, Send, X, ArrowUp, ChevronDown, Star } from "lucide-react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 
 import ScrollReveal from "@/components/ScrollReveal";
 
 import ClientCarousel from "@/components/ClientCarousel";
-import Testimonials from "@/components/Testimonials";
-import CylinderScroll, { StickySection } from "@/components/CylinderScroll";
+import CylinderScroll, { StickySection, useStickyScroll } from "@/components/CylinderScroll";
 
 const teamMembers = [
   {
     name: "Constanza Mackrey",
-    role: "Fundadora",
+    role: "CEO - Marketing y Comunicación",
     image: "https://ui-avatars.com/api/?name=Constanza+Mackrey&size=400&background=5a6b41&color=fff&bold=true",
-    bio: "Fundadora de Mack Studio. Comunicadora Social especializada en Marketing Digital y Agromarketing.\n\nLidera la agencia con una visión estratégica única, combinando su formación en comunicación con un profundo conocimiento del sector agroindustrial.",
+    bio: "Directora ejecutiva de Mack Studio. Comunicadora Social especializada en Marketing Digital y Agromarketing.\n\nLidera la agencia con una visión estratégica orientada a resultados, integrando comunicación, negocio y posicionamiento de marca. Su diferencial radica en el profundo conocimiento del sector agroindustrial, que le permite desarrollar estrategias alineadas al contexto y a las necesidades reales de cada cliente.\n\nSupervisa y acompaña cada proyecto desde una mirada integral, asegurando coherencia, impacto y una comunicación con sentido.",
   },
   {
     name: "Belén Massigoge",
-    role: "Redes Sociales y Marketing",
+    role: "Marketing y Redes Sociales",
     image: "https://ui-avatars.com/api/?name=Belén+Massigoge&size=400&background=8f9d67&color=fff&bold=true",
-    bio: "Especialista en gestión de redes sociales y estrategias de marketing digital.\n\nSe encarga de crear y gestionar el contenido de nuestros clientes en redes sociales, asegurando coherencia de marca y maximizando el alcance orgánico.",
+    bio: "Especialista en estrategias de marketing digital y gestión de redes sociales, con foco en la planificación, ejecución y optimización de contenido.\n\nSe encarga de diseñar estrategias y gestionar la comunicación digital de nuestros clientes, creando contenidos alineados a cada marca y a sus objetivos. Su trabajo busca garantizar coherencia, consistencia y un crecimiento sostenido del alcance y la interacción en redes sociales.",
   },
   {
     name: "Candela Montovi",
-    role: "Redes Sociales y Marketing",
+    role: "Marketing y Redes Sociales",
     image: "https://ui-avatars.com/api/?name=Candela+Montovi&size=400&background=6b7c4e&color=fff&bold=true",
-    bio: "Especialista en gestión de redes sociales y estrategias de marketing digital.\n\nAcompaña a las marcas en su presencia digital con creatividad y datos, generando contenido que conecta con las audiencias del sector agroindustrial.",
+    bio: "Especialista en estrategias de marketing digital y gestión de redes sociales, con un enfoque orientado a la planificación, ejecución y optimización de contenidos.\n\nAcompaña a las marcas desde una mirada creativa y estratégica, desarrollando propuestas que generan valor y conexión real con sus audiencias. Su trabajo combina análisis, tendencias y creatividad para potenciar la presencia digital de cada cliente y lograr una comunicación coherente, efectiva y alineada a sus objetivos.",
   },
   {
     name: "Agostina Morey",
-    role: "Diseñadora Gráfica",
+    role: "Diseño Gráfico",
     image: "https://ui-avatars.com/api/?name=Agostina+Morey&size=400&background=b5c48a&color=3d4a2a&bold=true",
-    bio: "Diseñadora Gráfica a cargo de la identidad visual de Mack Studio y sus clientes.\n\nCrea piezas visuales que transmiten la esencia de cada marca: desde logos y branding hasta material gráfico para redes y campañas digitales.",
+    bio: "Coordinadora del área de diseño gráfico de Mack Studio.\n\nResponsable de liderar y desarrollar la identidad visual de Mack Studio y de cada uno de sus clientes, asegurando coherencia, calidad y una estética alineada a la estrategia de comunicación.\n\nTrabaja en la conceptualización y creación de piezas visuales que reflejan la esencia de cada marca: desde el desarrollo de branding e identidad, hasta el diseño de contenidos para redes sociales, campañas digitales y materiales gráficos.\n\nSu enfoque combina creatividad y criterio estratégico, logrando que cada diseño no solo se vea bien, sino que comunique con claridad y propósito.",
   },
   {
-    name: "Juan Ignacio Suárez",
+    name: "Sofia Presa",
+    role: "Comunicación Visual y Redes Sociales",
+    image: "https://ui-avatars.com/api/?name=Sofia+Presa&size=400&background=a0b077&color=fff&bold=true",
+    bio: "Se especializa en la creación de contenido visual y la gestión de redes sociales, combinando diseño y comunicación para desarrollar piezas atractivas y funcionales.\n\nAcompaña la ejecución diaria de los proyectos, diseñando contenidos para redes y adaptando cada pieza a la identidad de marca de nuestros clientes. Su trabajo aporta dinamismo, coherencia visual y rapidez en la producción de contenido, contribuyendo a una comunicación efectiva y consistente.",
+  },
+  {
+    name: "Juan Ignacio Suarez",
     role: "Desarrollo Web",
-    image: "https://ui-avatars.com/api/?name=Juan+Ignacio+Suarez&size=400&background=4a5a35&color=fff&bold=true",
-    bio: "Desarrollador web responsable de los proyectos digitales de Mack Studio.\n\nDiseña y desarrolla sitios web modernos, funcionales y optimizados para SEO, asegurando que la presencia online de cada cliente sea impecable.",
+    image: "/juanignaciosuarez.PNG",
+    bio: "Responsable del desarrollo de los proyectos digitales de Mack Studio, enfocado en crear sitios web modernos, funcionales y alineados a los objetivos de cada marca.\n\nDiseña y desarrolla plataformas optimizadas en rendimiento, asegurando una experiencia de usuario clara, ágil y profesional. Su trabajo garantiza que la presencia online de cada cliente no solo sea visualmente atractiva, sino también estratégica y efectiva.",
   },
 ];
 
@@ -45,54 +50,63 @@ const servicesData = [
   {
     code: "01.",
     name: "MACK Strategy",
+    shortDescription: "Estrategia integral de marketing.",
     description: "Planificación estratégica integral de comunicación y marketing, adaptada a cada marca. Creamos campañas digitales efectivas, gestionamos envíos masivos y construimos planes que conectan con el público objetivo.",
     bullets: ["Campañas digitales", "Comunicación estratégica", "Marketing & Branding", "Envíos masivos"],
   },
   {
     code: "02.",
     name: "MACK Social",
+    shortDescription: "Gestión estratégica de redes.",
     description: "Gestión, asesoramiento y optimización de redes sociales. Diseñamos campañas creativas, generamos contenido relevante y realizamos análisis de métricas mensuales para potenciar resultados.",
     bullets: ["Gestión de redes", "Diseño de campañas", "Generación de contenido", "Análisis mensual de métricas"],
   },
   {
     code: "03.",
     name: "MACK Design",
+    shortDescription: "Identidad visual y branding.",
     description: "Creamos y fortalecemos tu identidad visual: logotipo, branding, papelería, catálogos, folletería, revistas, packaging, cartelería, gráfica vehicular y mailing.",
     bullets: ["Logotipo & Branding", "Papelería & Catálogos", "Packaging & Cartelería", "Gráfica vehicular"],
   },
   {
     code: "04.",
     name: "MACK Web",
+    shortDescription: "Desarrollo web y SEO.",
     description: "Diseño y desarrollo de sitios web responsivos, pensados para generar experiencias fluidas y profesionales. Optimizamos tu presencia con posicionamiento en Google y análisis de tráfico web.",
     bullets: ["Sitios web responsivos", "UX/UI profesional", "SEO & Posicionamiento", "Análisis de tráfico"],
   },
   {
     code: "05.",
     name: "MACK Media",
+    shortDescription: "Producción audiovisual de impacto.",
     description: "Producción de contenido visual de alto impacto: cobertura de fotos, videos institucionales, testimoniales, campañas y producciones audiovisuales que cuentan historias y transmiten emociones.",
     bullets: ["Fotografía profesional", "Videos institucionales", "Producciones audiovisuales", "Testimoniales"],
   },
   {
     code: "06.",
     name: "MACK Events",
+    shortDescription: "Organización de eventos.",
     description: "Planificamos y organizamos tu evento corporativo de principio a fin. Desde la comunicación previa hasta la cobertura en vivo, logramos que tu marca brille en cada detalle.",
     bullets: ["Planificación de eventos", "Comunicación previa", "Cobertura en vivo", "Branding de evento"],
   },
   {
     code: "07.",
     name: "MACK Academy",
+    shortDescription: "Capacitaciones y cursos.",
     description: "Cursos y capacitaciones diseñadas para potenciar habilidades en comunicación, marketing y gestión. Además, capacitaciones a medida para equipos empresariales.",
     bullets: ["Curso Community Manager", "Curso de Fotografía", "Curso de Marketing", "Comunicación Científica"],
   },
   {
     code: "08.",
     name: "MACK Consulting",
+    shortDescription: "Asesoría estratégica empresarial.",
     description: "Acompañamos a tu empresa en la definición de estrategias, posicionamiento de marca y toma de decisiones, brindando una mirada profesional, externa y orientada a resultados.",
     bullets: ["Estrategia empresarial", "Posicionamiento de marca", "Toma de decisiones", "Mirada externa"],
   },
   {
     code: "09.",
     name: "MACK Merch",
+    shortDescription: "Merchandising corporativo.",
     description: "Diseñamos y producimos merchandising corporativo que conecta tu marca con las personas: indumentaria, gorras, tazas, agendas, bolígrafos, bolsas, stands, materiales POP y más.",
     bullets: ["Indumentaria & Gorras", "Agendas & Bolígrafos", "Stands & POP", "Packaging de marca"],
   },
@@ -102,12 +116,107 @@ const cardAccents = [
   "#8f9d67", "#5a6b41", "#b5c48a", "#6b7c4e", "#8f9d67", "#4a5a35", "#a0b077", "#5a6b41", "#8f9d67"
 ];
 
+const testimonials = [
+  {
+    name: "Best Gym",
+    text: "Excelente profesional! Siempre responden a las exigencias. Excelente!! Todo es positivo. Calidad y confianza",
+    rating: 5,
+    logo: "/clients/GymBest_logoNEGRO.png",
+  },
+  {
+    name: "Raúl Andrés Propiedades",
+    text: "Desde la primera reunión con Coni, sentí que estábamos por el camino correcto. Hoy casi un año después, logramos una gran transformación y seguimos innovando juntos. ¡Excelente! El profesionalismo y el equipo de personas que componen Mack Studio hacen todo más sencillo. Capacidad, predisposición y comunicación al 100%. Belén es una genia !!",
+    rating: 5,
+    logo: "/clients/RaulAndres.png",
+  },
+];
+
+const ServicesSectionContent = ({ index, setSelectedService }: { index: number, setSelectedService: (i: number) => void }) => {
+  const { scrollYProgress, positions } = useStickyScroll();
+  const p = positions[index]?.startP || 0;
+  const d = positions[index]?.duration || 0;
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [yEnd, setYEnd] = useState(0);
+
+  useEffect(() => {
+    const updateRange = () => {
+      if (containerRef.current && window.innerWidth < 768) {
+        // Obtenemos la altura real exacta del contenedor de servicios
+        const contentHeight = containerRef.current.scrollHeight;
+        const windowHeight = window.innerHeight;
+
+        // Calculamos cuánto tiene que subir exactamente.
+        // Restamos 600 para que haya mucho espacio después del último servicio antes de transicionar
+        const exactScrollDistance = windowHeight - contentHeight - 400;
+
+        setYEnd(Math.min(0, exactScrollDistance));
+      } else {
+        setYEnd(0);
+      }
+    };
+
+    // Le damos un pequeño delay para asegurar que los estilos/fuentes estén aplicados
+    setTimeout(updateRange, 100);
+    window.addEventListener('resize', updateRange);
+    return () => window.removeEventListener('resize', updateRange);
+  }, []);
+
+  // Animamos desde 0 (posición inicial) hasta yEnd (altura exacta).
+  // Hacemos que termine al 85% de la duración (p + d * 0.85) para que llegue al fondo 
+  // ANTES de que el efecto cilindro empiece a desvanecer la sección.
+  const y = useTransform(scrollYProgress, [p, p + d * 0.85], [0, yEnd]);
+
+  return (
+    <motion.div
+      ref={containerRef}
+      // En móvil: pt-[30vh] para que empiece más abajo, y absolute para el scroll.
+      // En desktop: relative, md:pt-0 md:py-24 md:justify-center md:min-h-[100vh] para centrarlo.
+      className="w-full px-6 md:px-12 flex flex-col justify-start md:justify-center items-center pt-[30vh] pb-[15vh] md:pt-0 md:pb-0 md:py-24 md:min-h-[100vh] absolute md:relative top-0 left-0 right-0"
+      style={{ y }}
+    >
+      <div className="max-w-[1400px] w-full mx-auto">
+        <ScrollReveal>
+          <h2
+            className="font-bold text-foreground leading-[0.85] tracking-tight mb-8 md:mb-16 text-center md:text-left whitespace-nowrap"
+            style={{ fontSize: "clamp(1.75rem, 8.5vw, 8rem)" }}
+          >
+            Nuestros servicios.
+          </h2>
+        </ScrollReveal>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-8">
+          {servicesData.map((service, i) => (
+            <ScrollReveal key={i} delay={i * 0.05}>
+              <button
+                onClick={() => setSelectedService(i)}
+                className="w-full text-left p-3 md:p-6 rounded-[20px] md:rounded-[25px] border border-primary/20 hover:border-primary transition-all duration-300 group flex flex-col items-center text-center min-h-[90px] md:min-h-[140px] justify-center relative shadow-sm"
+                style={{ background: "rgba(143, 157, 103, 0.05)" }}
+              >
+                <div className="flex flex-col items-center justify-center">
+                  <h3 className="text-sm md:text-lg font-bold text-primary mb-0.5 uppercase tracking-widest leading-tight">
+                    {service.name}
+                  </h3>
+                  <p className="text-[9px] md:text-xs text-foreground/60 leading-relaxed font-medium uppercase tracking-wide">
+                    {service.shortDescription}
+                  </p>
+                </div>
+                <div className="mt-1">
+                  <ChevronDown className="text-primary/30 group-hover:text-primary transition-all duration-300 transform group-hover:translate-y-0.5" size={14} />
+                </div>
+              </button>
+            </ScrollReveal>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 const HomePage = () => {
   const [selectedMember, setSelectedMember] = useState<number | null>(null);
-  const [modalPos, setModalPos] = useState<{ x: number; y: number; mobile: boolean } | null>(null);
+  const [selectedService, setSelectedService] = useState<number | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -121,33 +230,8 @@ const HomePage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleCardEnter = (i: number, e: React.MouseEvent<HTMLDivElement>) => {
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    const isMobile = window.innerWidth < 768;
-    if (isMobile) {
-      // Mobile: center on screen
-      setModalPos({ x: window.innerWidth / 2, y: window.innerHeight / 2, mobile: true });
-    } else {
-      // Desktop: above the card
-      const rect = e.currentTarget.getBoundingClientRect();
-      const MODAL_W = Math.min(560, window.innerWidth - 32);
-      const rawX = rect.left + rect.width / 2;
-      const clampedX = Math.max(MODAL_W / 2 + 16, Math.min(window.innerWidth - MODAL_W / 2 - 16, rawX));
-      setModalPos({ x: clampedX, y: rect.top, mobile: false });
-    }
+  const handleCardClick = (i: number) => {
     setSelectedMember(i);
-  };
-  const handleCardLeave = () => {
-    // On mobile, modal stays open until X is tapped
-    if (modalPos?.mobile) return;
-    closeTimeoutRef.current = setTimeout(() => setSelectedMember(null), 150);
-  };
-  const handleModalEnter = () => {
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-  };
-  const handleModalLeave = () => {
-    if (modalPos?.mobile) return;
-    setSelectedMember(null);
   };
   const closeModal = () => setSelectedMember(null);
 
@@ -171,13 +255,13 @@ const HomePage = () => {
               />
             </ScrollReveal>
             <ScrollReveal delay={0.2}>
-              <p className="text-sm md:text-lg text-foreground/80 mt-8 max-w-2xl leading-relaxed">
+              <p className="text-base md:text-lg text-foreground/80 mt-8 max-w-2xl leading-relaxed">
                 Somos tu equipo estratégico de Agromarketing y Comunicación. Sabemos el esfuerzo que hay detrás de cada empresa, por eso queremos contar tu historia ayudándote a conectar con tu audiencia. Impulsamos tu marca y conectamos el Agro con las personas a través del marketing digital.
               </p>
             </ScrollReveal>
             <ScrollReveal delay={0.3}>
               <p className="text-sm md:text-base text-foreground/60 mt-8 max-w-xl italic leading-relaxed">
-                "Somos la agencia que entiende de agro y de comunicación, porque nacimos en el campo" <span className="not-italic font-semibold">El agro, pero con estrategia.</span>
+                "Somos la agencia que entiende de agro y de comunicación porque nacimos en el campo" <span className="not-italic font-semibold">El agro, pero con estrategia.</span>
               </p>
             </ScrollReveal>
           </div>
@@ -188,36 +272,37 @@ const HomePage = () => {
       id: "mision",
       bgColorClass: "bg-primary",
       bgImage: "url('/fondo_verde_oscuro_mack.png')",
+      theme: "dark",
       scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
       content: (
-        <div className="w-full px-6 md:px-12 py-20 md:py-32 flex flex-col justify-center items-center">
+        <div className="w-full px-6 md:px-12 py-12 md:py-32 flex flex-col justify-center items-center">
           <div className="max-w-[1400px] w-full mx-auto">
-            <div className="grid md:grid-cols-2 gap-12 md:gap-20">
+            <div className="grid md:grid-cols-2 gap-8 md:gap-20">
               <ScrollReveal delay={0.1}>
                 <h2
-                  className="font-bold text-primary-foreground leading-[0.85] tracking-tight mb-8"
-                  style={{ fontSize: "clamp(2.5rem, 8vw, 5rem)" }}
+                  className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-6 md:mb-16"
+                  style={{ fontSize: "clamp(2rem, 8vw, 5rem)" }}
                 >
                   Misión.
                 </h2>
-                <p className="text-sm md:text-base text-primary-foreground/80 leading-relaxed mb-4">
+                <p className="text-[13px] md:text-lg text-secondary-foreground/90 leading-snug md:leading-relaxed mb-3 md:mb-4">
                   En Mack Studio acompañamos a las marcas del agro y otros sectores a comunicar con autenticidad, contando la historia que hay detrás de cada proyecto.
                 </p>
-                <p className="text-sm md:text-base text-primary-foreground/80 leading-relaxed">
+                <p className="text-[13px] md:text-lg text-secondary-foreground/90 leading-snug md:leading-relaxed">
                   Nuestra misión es crear estrategias creativas y efectivas, combinando comunicación, marketing y diseño con un profundo conocimiento técnico del campo, para lograr que cada empresa conecte de manera real con su audiencia.
                 </p>
               </ScrollReveal>
               <ScrollReveal delay={0.2}>
                 <h2
-                  className="font-bold text-primary-foreground leading-[0.85] tracking-tight mb-8"
-                  style={{ fontSize: "clamp(2.5rem, 8vw, 5rem)" }}
+                  className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-6 md:mb-16 mt-8 md:mt-0"
+                  style={{ fontSize: "clamp(2rem, 8vw, 5rem)" }}
                 >
                   Visión.
                 </h2>
-                <p className="text-sm md:text-base text-primary-foreground/80 leading-relaxed mb-4">
+                <p className="text-[13px] md:text-lg text-secondary-foreground/90 leading-snug md:leading-relaxed mb-3 md:mb-4">
                   Ser la agencia de agromarketing y comunicación líder, reconocida por dar voz a quienes producen y por transformar el esfuerzo de las empresas en marcas sólidas, cercanas e innovadoras.
                 </p>
-                <p className="text-sm md:text-base text-primary-foreground/80 leading-relaxed">
+                <p className="text-[13px] md:text-lg text-secondary-foreground/90 leading-snug md:leading-relaxed">
                   Queremos consolidarnos como un aliado estratégico del sector agropecuario, llevando la comunicación a un nivel más humano, técnico y creativo, que inspire confianza y crecimiento sostenido.
                 </p>
               </ScrollReveal>
@@ -249,16 +334,14 @@ const HomePage = () => {
                   <ScrollReveal delay={i * 0.08}>
                     <div
                       className="flex flex-col items-center text-center cursor-pointer group w-full md:w-44"
-                      onMouseEnter={(e) => handleCardEnter(i, e)}
-                      onMouseLeave={handleCardLeave}
-                      onClick={(e) => handleCardEnter(i, e)}
+                      onClick={() => handleCardClick(i)}
                     >
-                      <div className="w-full aspect-square md:w-40 md:h-40 rounded-full overflow-hidden mb-3 md:mb-4 ring-4 ring-transparent group-hover:ring-secondary-foreground/40 transition-all duration-300 group-hover:scale-105 transform">
+                      <div className="w-full aspect-square md:w-40 md:h-40 rounded-full overflow-hidden mb-3 md:mb-4 ring-4 ring-transparent group-hover:ring-secondary-foreground/40 transition-all duration-300 group-hover:scale-105 transform shadow-lg">
                         <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
                       </div>
                       <h3 className="text-xs md:text-base font-bold text-secondary-foreground leading-tight">{member.name}</h3>
                       <p className="text-[9px] md:text-xs text-secondary-foreground/60 mt-0.5 md:mt-1 uppercase tracking-wider leading-relaxed">{member.role}</p>
-                      <p className="hidden md:block text-xs text-secondary-foreground/40 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Ver más →</p>
+                      <p className="text-[9px] md:text-xs text-secondary-foreground/40 mt-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">Saber más →</p>
                     </div>
                   </ScrollReveal>
                 </div>
@@ -272,25 +355,26 @@ const HomePage = () => {
       id: "clientes",
       bgColorClass: "bg-primary",
       bgImage: "url('/fondo_verde_oscuro_mack.png')",
+      theme: "dark",
       scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
       content: (
         <div className="w-full px-6 md:px-12 flex flex-col justify-center items-center h-full">
           <div className="max-w-[1400px] w-full mx-auto">
             <ScrollReveal>
               <h2
-                className="font-bold text-primary-foreground leading-[0.85] tracking-tight mb-8"
-                style={{ fontSize: "clamp(2.5rem, 8vw, 6rem)" }}
+                className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-6 md:mb-10"
+                style={{ fontSize: "clamp(2rem, 10vw, 8rem)" }}
               >
-                Nuestros<br />clientes.
+                Nuestros clientes.
               </h2>
-              <p className="text-sm md:text-base text-primary-foreground/70 max-w-xl leading-relaxed mb-16">
+              <p className="text-sm md:text-lg text-primary-foreground/70 max-w-xl leading-relaxed mb-10 md:mb-16">
                 Trabajamos con las principales empresas del sector agroindustrial, construyendo relaciones de confianza a largo plazo.
               </p>
             </ScrollReveal>
 
             {/* Cartera de Clientes - Carousel */}
             <ScrollReveal>
-              <h3 className="text-2xl md:text-3xl font-bold text-primary-foreground text-center mb-12">
+              <h3 className="text-xl md:text-3xl font-bold text-secondary-foreground text-center mb-8 md:mb-12">
                 Cartera de Clientes
               </h3>
               <ClientCarousel />
@@ -299,86 +383,68 @@ const HomePage = () => {
         </div>
       ),
     },
-    {
-      id: "testimonios",
+    // EXPERIENCIAS STACKED SECTIONS
+    ...testimonials.map((t, i) => ({
+      id: `experiencia-${i}`,
       bgColorClass: "bg-primary",
       bgImage: "url('/fondo_verde_oscuro_mack.png')",
-      scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
-      content: (
-        <div className="w-full px-6 md:px-12 flex flex-col justify-center items-center h-full">
-          <div className="max-w-[1400px] w-full mx-auto">
-            {/* Clientes Satisfechos */}
-            <ScrollReveal>
-              <div>
-                <h3 className="text-2xl md:text-3xl font-bold text-primary-foreground text-center mb-12">
-                  Clientes Satisfechos
-                </h3>
-                <Testimonials />
-              </div>
-            </ScrollReveal>
-          </div>
-        </div>
-      ),
-    },
-    // SERVICES STACKED SECTIONS
-    ...servicesData.map((service, i) => ({
-      id: i === 0 ? "servicios" : `servicios-${i}`,
-      bgColorClass: "bg-background",
-      bgImage: "url('/fondo_claro_mack.png')",
+      theme: "dark",
       isStack: true,
-      scrollWeight: 0.5, // Faster stacking for services
+      scrollWeight: 0.6,
       content: (
-        <div className="w-full h-full flex items-center px-6 md:px-12 max-w-[1400px] mx-auto overflow-hidden">
-          {/* Card Container (Always stays at flex-1 to occupy 62% if title exists or same space if not) */}
-          <div className="flex-1 relative flex items-center justify-center h-full">
-            <div
-              className="rounded-3xl shadow-2xl overflow-hidden w-full max-w-[420px]"
-              style={{
-                background: "white",
-                border: "1px solid rgba(0,0,0,0.07)",
-              }}
-            >
-              <div style={{ height: "4px", background: cardAccents[i] }} />
-              <div className="p-8 md:p-10">
-                <p className="text-xs font-bold tracking-[0.25em] uppercase mb-3" style={{ color: cardAccents[i] }}>
-                  {service.code}
-                </p>
-                <h3 className="font-black text-gray-900 leading-tight mb-4 text-2xl md:text-3xl">
-                  {service.name}
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed mb-6">
-                  {service.description}
-                </p>
-                {service.bullets && (
-                  <ul className="space-y-2">
-                    {service.bullets.map((b, j) => (
-                      <li key={j} className="flex items-center gap-2 text-sm text-gray-600">
-                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: cardAccents[i] }} />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+        <div className="w-full h-full flex flex-col items-center justify-center px-6 md:px-12">
+          {i === 0 && (
+            <div className="absolute top-[24%] md:top-[15%] left-0 w-full px-6 md:px-12 pointer-events-none mb-12">
+              <div className="max-w-[1400px] w-full mx-auto">
+                <h2
+                  className="font-bold text-secondary-foreground leading-[0.85] tracking-tight"
+                  style={{ fontSize: "clamp(2rem, 10vw, 8rem)" }}
+                >
+                  Experiencias.
+                </h2>
               </div>
             </div>
-          </div>
+          )}
+          <div className="max-w-xl w-full mx-auto relative z-10 mt-32 md:mt-40">
+            {/* Logo superpuesto rectangular */}
+            <div className="absolute left-1/2 -top-12 -translate-x-1/2 w-48 h-24 bg-white rounded-2xl shadow-sm flex items-center justify-center z-20 overflow-hidden px-4">
+              {t.logo ? (
+                <img src={t.logo} alt={t.name} className="w-full h-full object-contain" />
+              ) : (
+                <span className="text-primary text-xl font-black uppercase text-center leading-tight">
+                  {t.name}
+                </span>
+              )}
+            </div>
 
-          {/* Desktop Title Column - remains as is */}
-          <div className="hidden md:flex w-[38%] flex-col justify-center items-start md:pl-8 select-none pointer-events-none">
-            {i === 0 && (
-              <>
-                <p className="text-[25px] tracking-[0.3em] text-foreground/40 uppercase mb-4">Nuestros</p>
-                <h2
-                  className="font-black text-foreground leading-[0.82] tracking-tighter text-[6.5rem]"
-                >
-                  servicios.
-                </h2>
-              </>
-            )}
+            {/* Tarjeta blanca sólida con texto oscuro y estrellas doradas */}
+            <div className="bg-white rounded-[30px] p-6 md:p-10 pt-16 md:pt-16 shadow-2xl relative">
+              <h3 className="text-lg md:text-2xl font-black text-primary text-center uppercase tracking-widest mb-3 md:mb-4">
+                {t.name}
+              </h3>
+
+              <p className="text-[13px] md:text-lg text-primary/90 font-medium leading-snug md:leading-relaxed text-center">
+                "{t.text}"
+              </p>
+
+              {/* 5 estrellas agregadas al final */}
+              <div className="flex justify-center gap-1 mt-6">
+                {Array.from({ length: 5 }).map((_, j) => (
+                  <Star key={j} size={16} className="fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )
     })),
+    {
+      id: "servicios",
+      bgColorClass: "bg-background",
+      bgImage: "url('/fondo_claro_mack.png')",
+      scrollWeight: typeof window !== "undefined" && window.innerWidth < 768 ? 1.2 : 0.8,
+      content: <ServicesSectionContent index={4 + testimonials.length} setSelectedService={setSelectedService} />,
+    },
     // CONTACT SECTION
     {
       id: "contacto",
@@ -451,99 +517,123 @@ const HomePage = () => {
       <CylinderScroll sections={sections} />
 
       {/* Team Member Modal */}
-      {selectedMember !== null && modalPos !== null && (
-        <>
-          {/* Mobile backdrop */}
-          {modalPos.mobile && (
-            <div
-              className="fixed inset-0 z-[99] bg-black/60"
-              onClick={closeModal}
-            />
-          )}
-
-          <div
-            style={modalPos.mobile ? {
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: 100,
-              width: "min(560px, calc(100vw - 32px))",
-              pointerEvents: "none",
-            } : {
-              position: "fixed",
-              left: `${modalPos.x}px`,
-              top: `${modalPos.y - 20}px`,
-              transform: "translate(-50%, -100%)",
-              zIndex: 100,
-              width: "min(560px, calc(100vw - 32px))",
-              pointerEvents: "none",
-            }}
+      {selectedMember !== null && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeModal}
+            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="relative w-full max-w-4xl bg-white rounded-[40px] shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="rounded-3xl overflow-hidden relative"
-              style={{
-                background: "rgba(143, 157, 103, 0.98)", // Mack Olive
-                backdropFilter: "blur(40px) saturate(180%)",
-                border: "1px solid rgba(255, 255, 255, 0.3)",
-                boxShadow: "0 28px 70px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
-                pointerEvents: "auto",
-              }}
-              onMouseEnter={handleModalEnter}
-              onMouseLeave={handleModalLeave}
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 md:top-6 md:right-6 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm transition-all"
             >
-              {/* Close button — always on mobile */}
-              {modalPos.mobile && (
-                <button
-                  onClick={closeModal}
-                  className="absolute top-3 right-3 z-20 w-7 h-7 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 text-black/50 hover:text-black transition-all"
-                  aria-label="Cerrar"
-                >
-                  <X size={14} />
-                </button>
-              )}
-              <div className="flex flex-col md:flex-row">
-                {/* Photo: top on mobile, left on desktop */}
-                <div className="w-full h-52 md:w-44 md:h-auto flex-shrink-0 relative overflow-hidden">
-                  <img
-                    src={teamMembers[selectedMember].image}
-                    alt={teamMembers[selectedMember].name}
-                    className="w-full h-full object-cover absolute inset-0"
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background: modalPos.mobile
-                        ? "linear-gradient(to bottom, transparent 55%, rgba(143, 157, 103, 0.6))"
-                        : "linear-gradient(to right, transparent 55%, rgba(143, 157, 103, 0.5))",
-                    }}
-                  />
-                </div>
-                {/* Info */}
-                <div className="flex-1 p-5 md:p-6 flex flex-col justify-center">
-                  <p
-                    className="text-[10px] font-bold tracking-[0.3em] uppercase mb-2 text-black/40"
-                  >
-                    {teamMembers[selectedMember].role}
-                  </p>
-                  <h3 className="text-lg md:text-xl font-black text-white leading-tight">
-                    {teamMembers[selectedMember].name}
-                  </h3>
-                  <div
-                    style={{ width: "32px", height: "2px", background: "rgba(0,0,0,0.2)", borderRadius: "2px", margin: "10px 0" }}
-                  />
-                  <p className="text-xs text-black/70 leading-relaxed whitespace-pre-line">
+              <X size={20} />
+            </button>
+
+            <div className="flex flex-col md:flex-row min-h-[400px]">
+              {/* Photo */}
+              <div className="w-full md:w-[40%] h-64 md:h-auto relative group">
+                <img
+                  src={teamMembers[selectedMember].image}
+                  alt={teamMembers[selectedMember].name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-primary/30 to-transparent mix-blend-multiply" />
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 p-8 md:p-12 flex flex-col justify-center">
+                <p className="text-xs md:text-sm font-bold tracking-[0.4em] uppercase mb-3 text-primary/50">
+                  {teamMembers[selectedMember].role}
+                </p>
+                <h3 className="text-3xl md:text-5xl font-black text-primary leading-[0.9] mb-6">
+                  {teamMembers[selectedMember].name}
+                </h3>
+                <div className="w-16 h-1 bg-primary/10 rounded-full mb-8" />
+                <div className="max-h-[300px] overflow-y-auto pr-4 custom-scrollbar">
+                  <p className="text-sm md:text-lg text-primary/80 leading-relaxed whitespace-pre-line font-medium">
                     {teamMembers[selectedMember].bio}
                   </p>
                 </div>
               </div>
             </div>
-          </div>
-        </>
+          </motion.div>
+        </div>
       )}
 
-      {/* Mobile Services Title (Fixed, single instance) */}
-      <ServicesMobileTitle />
+      {/* Service Detail Modal */}
+      <AnimatePresence>
+        {selectedService !== null && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedService(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-3xl bg-background rounded-[45px] shadow-2xl overflow-hidden border border-primary/20"
+            >
+              <button
+                onClick={() => setSelectedService(null)}
+                className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all z-10"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="p-8 md:p-16">
+                <div className="flex items-center gap-4 mb-6">
+                  <span className="text-xs font-black tracking-[0.3em] text-primary/40 uppercase">
+                    {servicesData[selectedService].code}
+                  </span>
+                  <div className="h-px flex-1 bg-primary/10" />
+                </div>
+
+                <h3 className="text-3xl md:text-5xl font-black text-primary mb-8 tracking-tighter leading-none uppercase">
+                  {servicesData[selectedService].name}
+                </h3>
+
+                <p className="text-base md:text-xl text-foreground/80 leading-relaxed mb-10">
+                  {servicesData[selectedService].description}
+                </p>
+
+                {servicesData[selectedService].bullets && (
+                  <div className="grid md:grid-cols-2 gap-y-4 gap-x-12">
+                    {servicesData[selectedService].bullets.map((bullet, idx) => (
+                      <div key={idx} className="flex items-start gap-4">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
+                        <p className="text-sm md:text-base font-bold text-foreground/70 uppercase tracking-wide">
+                          {bullet}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-primary/5 p-6 md:p-8 flex justify-center border-t border-primary/10">
+                <p className="text-[10px] md:text-xs font-bold tracking-[0.4em] text-primary/40 uppercase">
+                  Mack Studio • Estrategia & Comunicación
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Scroll to top button */}
       <AnimatePresence>
@@ -561,41 +651,6 @@ const HomePage = () => {
         )}
       </AnimatePresence>
     </div>
-  );
-};
-
-const ServicesMobileTitle = () => {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const sectionId = (e as CustomEvent).detail as string;
-      // Show when we're in any service stack section
-      // Services have id "servicios" (first) or "section-N" for the rest
-      const isServices = sectionId === "servicios" || sectionId.startsWith("servicios-");
-      setVisible(isServices);
-    };
-    window.addEventListener("section-change", handler);
-    return () => window.removeEventListener("section-change", handler);
-  }, []);
-
-  return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.25 }}
-          className="md:hidden fixed top-20 left-0 w-full z-[70] flex flex-col items-center pointer-events-none text-center"
-        >
-          <p className="text-[14px] tracking-[0.3em] text-foreground/40 uppercase mb-1 font-bold">Nuestros</p>
-          <h2 className="font-black text-gray-900 leading-[0.82] tracking-tighter text-4xl">
-            servicios.
-          </h2>
-        </motion.div>
-      )}
-    </AnimatePresence>
   );
 };
 

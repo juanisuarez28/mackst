@@ -1,9 +1,22 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 
-const clients = Array.from({ length: 8 }, (_, i) => ({
-  name: `Cliente ${i + 1}`,
-}));
+const clients = [
+  { name: "El Mingo", logo: "/clients/El-Mingo.png" },
+  { name: "MC Agroservicios", logo: "/clients/Logo-MCAgroservicios.png" },
+  { name: "Raul Andres", logo: "/clients/RaulAndres.png" },
+  { name: "AAT", logo: "/clients/aat.png" },
+  { name: "Agrowise", logo: "/clients/agrowise.png" },
+  { name: "Grow Padel", logo: "/clients/growpadel.png" },
+  { name: "Gym Best", logo: "/clients/gymbest.png" },
+  { name: "IT", logo: "/clients/it.svg" },
+  { name: "La Camisería", logo: "/clients/la_camiseria.JPG" },
+  { name: "Las Nazarenas", logo: "/clients/lasnazarenas.svg" },
+  { name: "LT", logo: "/clients/lt.png" },
+  { name: "SyG", logo: "/clients/syg.png" },
+  { name: "Vet San Jose", logo: "/clients/vet.sanjose.png" },
+  { name: "Vetifarma", logo: "/clients/vetifarma.png" },
+];
 
 const ClientCarousel = () => {
   const [index, setIndex] = useState(0);
@@ -52,15 +65,15 @@ const ClientCarousel = () => {
           {clients.map((client, i) => (
             <div
               key={i}
-              className="shrink-0 px-2 md:px-4"
+              className="shrink-0 px-4 md:px-8"
               style={{ width: `${slideWidth}%` }}
             >
-              <div className="flex flex-col items-center">
-                <div className="w-24 h-24 md:w-36 md:h-36 rounded-full bg-primary-foreground/15 border-2 border-primary-foreground/20 flex items-center justify-center mx-auto">
-                  <span className="text-primary-foreground/40 text-xs font-medium">
-                    LOGO
-                  </span>
-                </div>
+              <div className="flex items-center justify-center h-24 md:h-36 group">
+                <img
+                  src={client.logo}
+                  alt={client.name}
+                  className="max-w-full max-h-full object-contain transition-all duration-300 group-hover:scale-110 grayscale brightness-200 opacity-60 hover:grayscale-0 hover:brightness-100 hover:opacity-100"
+                />
               </div>
             </div>
           ))}

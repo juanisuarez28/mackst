@@ -32,8 +32,8 @@ const Testimonials = () => {
 
           {/* Card */}
           <div className="bg-primary-foreground/15 backdrop-blur-sm rounded-2xl p-3 pt-8 md:p-6 md:pt-10 text-center border border-primary-foreground/10">
-            <h4 className="font-bold text-primary-foreground text-[11px] md:text-sm">{t.name}</h4>
-            <p className="text-[10px] md:text-xs text-primary-foreground/70 mt-2 md:mt-3 leading-relaxed">
+            <h4 className="font-bold text-primary-foreground text-sm md:text-base">{t.name}</h4>
+            <p className="text-xs md:text-sm text-primary-foreground/70 mt-2 md:mt-3 leading-relaxed">
               {t.text}
             </p>
           </div>

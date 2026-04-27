@@ -15,11 +15,23 @@ interface StickyScrollProps {
   sections: StickySection[];
 }
 
+interface ScrollContextValue {
+  scrollYProgress: MotionValue<number> | null;
+  positions: { startP: number; duration: number }[];
+}
+
+export const ScrollContext = React.createContext<ScrollContextValue>({
+  scrollYProgress: null,
+  positions: [],
+});
+
+export const useStickyScroll = () => React.useContext(ScrollContext);
+
 // Helper to get weight-based positions
 const getSectionPositions = (sections: StickySection[]) => {
   const weights = sections.map(s => s.scrollWeight || 1);
   const totalWeight = weights.reduce((a, b) => a + b, 0);
-  
+
   let currentWeight = 0;
   return sections.map((_, i) => {
     const startP = currentWeight / totalWeight;
@@ -32,12 +44,12 @@ const getSectionPositions = (sections: StickySection[]) => {
 // Helper to group identical contiguous backgrounds
 const getBackgroundGroups = (sections: StickySection[], positions: { startP: number; duration: number }[]) => {
   const groups: { bgImage?: string; bgColorClass?: string; startP: number; endP: number; fadeD: number }[] = [];
-  
+
   sections.forEach((sec, i) => {
     const { startP, duration } = positions[i];
     const endP = startP + duration;
     const lastGroup = groups[groups.length - 1];
-    
+
     if (lastGroup && lastGroup.bgImage === sec.bgImage && lastGroup.bgColorClass === sec.bgColorClass) {
       lastGroup.endP = endP;
     } else {
@@ -50,7 +62,7 @@ const getBackgroundGroups = (sections: StickySection[], positions: { startP: num
       });
     }
   });
-  
+
   return groups;
 };
 
@@ -68,7 +80,7 @@ const BackgroundLayer = ({
   const opacity = useTransform(scrollYProgress, (val) => {
     // If within the group's range, opacity is 1
     if (val >= group.startP && val <= group.endP) return 1;
-    
+
     // If outside, fade out over distance 'd'
     if (val < group.startP) {
       const distance = group.startP - val;
@@ -130,15 +142,15 @@ const ContentLayer = ({
     const center = p + d / 2;
     const plateauHalf = d * 0.35;
     const transitionWidth = d * 0.15;
-    
+
     if (isFirst && val <= center) return 1;
     if (isLast && val >= center) return 1;
 
     const distance = Math.abs(val - center);
-    
+
     if (distance <= plateauHalf) return 1;
     if (distance > plateauHalf + transitionWidth) return 0;
-    
+
     return 1 - (distance - plateauHalf) / transitionWidth;
   });
 
@@ -172,7 +184,7 @@ const ContentLayer = ({
   const stackOpacity = useTransform(scrollYProgress, (val) => {
     if (val < p - fadeWidth) return 0;
     if (val < p) return (val - (p - fadeWidth)) / fadeWidth;
-    
+
     // If we have passed the end of the entire stack, fade out the whole mazo
     if (stackEndP !== undefined && val > stackEndP) {
       const distance = val - stackEndP;
@@ -277,7 +289,7 @@ export const CylinderScroll: React.FC<StickyScrollProps> = ({ sections }) => {
     // Find the currently active section index based on weighted positions
     const activeIndex = positions.findIndex(pos => latest >= pos.startP && latest < pos.startP + pos.duration);
     const finalIndex = activeIndex === -1 ? (latest >= 0.5 ? totalSections - 1 : 0) : activeIndex;
-    
+
     const activeSection = sections[finalIndex];
     if (activeSection) {
       let theme = activeSection.theme;
@@ -321,58 +333,60 @@ export const CylinderScroll: React.FC<StickyScrollProps> = ({ sections }) => {
         );
       })}
 
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          height: "100vh",
-          overflow: "hidden",
-        }}
-      >
-        {/* Layer 1: Backgrounds */}
-        <div className="absolute inset-0 w-full h-full pointer-events-none">
-          {bgGroups.map((group, index) => (
-            <BackgroundLayer
-              key={`bg-group-${index}`}
-              group={group}
-              scrollYProgress={scrollYProgress}
-            />
-          ))}
-        </div>
-
-        {/* Layer 2: Content */}
-        <div className="absolute inset-0 w-full h-full">
-          {sections.map((section, index) => {
-            const { startP: p, duration: d } = positions[index];
-            let stackEndP: number | undefined;
-            
-            if (section.isStack) {
-              let lastInStack = index;
-              for (let i = index + 1; i < totalSections; i++) {
-                if (sections[i].isStack) lastInStack = i;
-                else break;
-              }
-              stackEndP = positions[lastInStack].startP + positions[lastInStack].duration;
-            }
-
-            return (
-              <ContentLayer
-                key={`content-${index}`}
-                p={p}
-                d={d}
-                index={index}
-                total={totalSections}
+      <ScrollContext.Provider value={{ scrollYProgress, positions }}>
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            height: "100vh",
+            overflow: "hidden",
+          }}
+        >
+          {/* Layer 1: Backgrounds */}
+          <div className="absolute inset-0 w-full h-full pointer-events-none">
+            {bgGroups.map((group, index) => (
+              <BackgroundLayer
+                key={`bg-group-${index}`}
+                group={group}
                 scrollYProgress={scrollYProgress}
-                isStack={section.isStack}
-                nextSectionIsStack={sections[index + 1]?.isStack}
-                stackEndP={stackEndP}
-              >
-                {section.content}
-              </ContentLayer>
-            );
-          })}
+              />
+            ))}
+          </div>
+
+          {/* Layer 2: Content */}
+          <div className="absolute inset-0 w-full h-full">
+            {sections.map((section, index) => {
+              const { startP: p, duration: d } = positions[index];
+              let stackEndP: number | undefined;
+
+              if (section.isStack) {
+                let lastInStack = index;
+                for (let i = index + 1; i < totalSections; i++) {
+                  if (sections[i].isStack) lastInStack = i;
+                  else break;
+                }
+                stackEndP = positions[lastInStack].startP + positions[lastInStack].duration;
+              }
+
+              return (
+                <ContentLayer
+                  key={`content-${index}`}
+                  p={p}
+                  d={d}
+                  index={index}
+                  total={totalSections}
+                  scrollYProgress={scrollYProgress}
+                  isStack={section.isStack}
+                  nextSectionIsStack={sections[index + 1]?.isStack}
+                  stackEndP={stackEndP}
+                >
+                  {section.content}
+                </ContentLayer>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </ScrollContext.Provider>
     </div>
   );
 };

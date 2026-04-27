@@ -114,7 +114,7 @@ const ServicesStack: React.FC = () => {
               className="font-black text-gray-900 leading-[0.82] tracking-tighter"
               style={{ fontSize: "clamp(2.5rem, 8vw, 6.5rem)" }}
             >
-              servicios.
+              Nuestros servicios.
             </h2>
             {/* Scroll indicator - only on desktop */}
             <div className="hidden md:flex mt-10 flex-col gap-2">
