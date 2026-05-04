@@ -11,19 +11,19 @@ const teamMembers = [
   {
     name: "Constanza Mackrey",
     role: "CEO - Marketing y Comunicación",
-    image: "https://ui-avatars.com/api/?name=Constanza+Mackrey&size=400&background=5a6b41&color=fff&bold=true",
+    image: "/Coni2.JPG",
     bio: "Directora ejecutiva de Mack Studio. Comunicadora Social especializada en Marketing Digital y Agromarketing.\n\nLidera la agencia con una visión estratégica orientada a resultados, integrando comunicación, negocio y posicionamiento de marca. Su diferencial radica en el profundo conocimiento del sector agroindustrial, que le permite desarrollar estrategias alineadas al contexto y a las necesidades reales de cada cliente.\n\nSupervisa y acompaña cada proyecto desde una mirada integral, asegurando coherencia, impacto y una comunicación con sentido.",
   },
   {
     name: "Belén Massigoge",
     role: "Marketing y Redes Sociales",
-    image: "https://ui-avatars.com/api/?name=Belén+Massigoge&size=400&background=8f9d67&color=fff&bold=true",
+    image: "/Bele.JPG",
     bio: "Especialista en estrategias de marketing digital y gestión de redes sociales, con foco en la planificación, ejecución y optimización de contenido.\n\nSe encarga de diseñar estrategias y gestionar la comunicación digital de nuestros clientes, creando contenidos alineados a cada marca y a sus objetivos. Su trabajo busca garantizar coherencia, consistencia y un crecimiento sostenido del alcance y la interacción en redes sociales.",
   },
   {
     name: "Candela Montovi",
     role: "Marketing y Redes Sociales",
-    image: "https://ui-avatars.com/api/?name=Candela+Montovi&size=400&background=6b7c4e&color=fff&bold=true",
+    image: "/Cande.png",
     bio: "Especialista en estrategias de marketing digital y gestión de redes sociales, con un enfoque orientado a la planificación, ejecución y optimización de contenidos.\n\nAcompaña a las marcas desde una mirada creativa y estratégica, desarrollando propuestas que generan valor y conexión real con sus audiencias. Su trabajo combina análisis, tendencias y creatividad para potenciar la presencia digital de cada cliente y lograr una comunicación coherente, efectiva y alineada a sus objetivos.",
   },
   {
@@ -35,7 +35,7 @@ const teamMembers = [
   {
     name: "Sofia Presa",
     role: "Comunicación Visual y Redes Sociales",
-    image: "https://ui-avatars.com/api/?name=Sofia+Presa&size=400&background=a0b077&color=fff&bold=true",
+    image: "/sofia.jpeg",
     bio: "Se especializa en la creación de contenido visual y la gestión de redes sociales, combinando diseño y comunicación para desarrollar piezas atractivas y funcionales.\n\nAcompaña la ejecución diaria de los proyectos, diseñando contenidos para redes y adaptando cada pieza a la identidad de marca de nuestros clientes. Su trabajo aporta dinamismo, coherencia visual y rapidez en la producción de contenido, contribuyendo a una comunicación efectiva y consistente.",
   },
   {
@@ -122,6 +122,12 @@ const testimonials = [
     text: "Excelente profesional! Siempre responden a las exigencias. Excelente!! Todo es positivo. Calidad y confianza",
     rating: 5,
     logo: "/clients/GymBest_logoNEGRO.png",
+  },
+  {
+    name: "El Mingo",
+    text: "Servicio activo y muy eficiente. La mejor experiencia porque están siempre atentas a las necesidades del cliente y en pos de los mejores resultados",
+    rating: 5,
+    logo: "/clients/elmingonegro.png",
   },
   {
     name: "Raúl Andrés Propiedades",
@@ -530,19 +536,19 @@ const HomePage = () => {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-4xl bg-white rounded-[40px] shadow-2xl overflow-hidden"
+            className="relative w-full max-w-3xl bg-white rounded-[30px] md:rounded-[40px] shadow-2xl overflow-y-auto overflow-x-hidden max-h-[90vh] custom-scrollbar"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 md:top-6 md:right-6 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm transition-all"
+              className="absolute top-4 right-4 z-40 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm transition-all"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
 
-            <div className="flex flex-col md:flex-row min-h-[400px]">
+            <div className="flex flex-col md:flex-row min-h-[auto] md:min-h-[350px]">
               {/* Photo */}
-              <div className="w-full md:w-[40%] h-64 md:h-auto relative group">
+              <div className="w-full md:w-[40%] h-64 md:h-auto relative flex-shrink-0 group">
                 <img
                   src={teamMembers[selectedMember].image}
                   alt={teamMembers[selectedMember].name}
@@ -552,16 +558,16 @@ const HomePage = () => {
               </div>
 
               {/* Content */}
-              <div className="flex-1 p-8 md:p-12 flex flex-col justify-center">
-                <p className="text-xs md:text-sm font-bold tracking-[0.4em] uppercase mb-3 text-primary/50">
+              <div className="flex-1 p-6 md:p-10 flex flex-col justify-center">
+                <p className="text-[10px] md:text-xs font-bold tracking-[0.4em] uppercase mb-2 text-primary/50">
                   {teamMembers[selectedMember].role}
                 </p>
-                <h3 className="text-3xl md:text-5xl font-black text-primary leading-[0.9] mb-6">
+                <h3 className="text-2xl md:text-4xl font-black text-primary leading-[0.9] mb-4">
                   {teamMembers[selectedMember].name}
                 </h3>
-                <div className="w-16 h-1 bg-primary/10 rounded-full mb-8" />
-                <div className="max-h-[300px] overflow-y-auto pr-4 custom-scrollbar">
-                  <p className="text-sm md:text-lg text-primary/80 leading-relaxed whitespace-pre-line font-medium">
+                <div className="w-12 h-1 bg-primary/10 rounded-full mb-4 md:mb-6" />
+                <div className="max-h-none overflow-visible">
+                  <p className="text-[13px] md:text-base text-primary/80 leading-relaxed whitespace-pre-line font-medium">
                     {teamMembers[selectedMember].bio}
                   </p>
                 </div>
@@ -586,37 +592,37 @@ const HomePage = () => {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-3xl bg-background rounded-[45px] shadow-2xl overflow-hidden border border-primary/20"
+              className="relative w-full max-w-2xl bg-background rounded-[30px] md:rounded-[40px] shadow-2xl overflow-hidden border border-primary/20"
             >
               <button
                 onClick={() => setSelectedService(null)}
-                className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all z-10"
+                className="absolute top-4 right-4 md:top-6 md:right-6 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all z-10"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
 
-              <div className="p-8 md:p-16">
-                <div className="flex items-center gap-4 mb-6">
-                  <span className="text-xs font-black tracking-[0.3em] text-primary/40 uppercase">
+              <div className="p-6 md:p-12">
+                <div className="flex items-center gap-3 mb-4 md:mb-6">
+                  <span className="text-[10px] md:text-xs font-black tracking-[0.3em] text-primary/40 uppercase">
                     {servicesData[selectedService].code}
                   </span>
                   <div className="h-px flex-1 bg-primary/10" />
                 </div>
 
-                <h3 className="text-3xl md:text-5xl font-black text-primary mb-8 tracking-tighter leading-none uppercase">
+                <h3 className="text-2xl md:text-4xl font-black text-primary mb-4 md:mb-6 tracking-tighter leading-none uppercase">
                   {servicesData[selectedService].name}
                 </h3>
 
-                <p className="text-base md:text-xl text-foreground/80 leading-relaxed mb-10">
+                <p className="text-[13px] md:text-lg text-foreground/80 leading-relaxed mb-6 md:mb-8">
                   {servicesData[selectedService].description}
                 </p>
 
                 {servicesData[selectedService].bullets && (
-                  <div className="grid md:grid-cols-2 gap-y-4 gap-x-12">
+                  <div className="grid md:grid-cols-2 gap-y-3 gap-x-8">
                     {servicesData[selectedService].bullets.map((bullet, idx) => (
-                      <div key={idx} className="flex items-start gap-4">
-                        <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                        <p className="text-sm md:text-base font-bold text-foreground/70 uppercase tracking-wide">
+                      <div key={idx} className="flex items-start gap-3">
+                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary mt-1.5 md:mt-2 flex-shrink-0" />
+                        <p className="text-[12px] md:text-sm font-bold text-foreground/70 uppercase tracking-wide">
                           {bullet}
                         </p>
                       </div>
