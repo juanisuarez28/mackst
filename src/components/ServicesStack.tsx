@@ -100,7 +100,7 @@ const ServicesStack: React.FC = () => {
           top: 0,
           height: "100vh",
           overflow: "hidden",
-          backgroundImage: "url('/fondo_claro_mack.png')",
+          backgroundImage: "url('/fondo_claro_mack.svg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

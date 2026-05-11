@@ -29,13 +29,13 @@ const teamMembers = [
   {
     name: "Agostina Morey",
     role: "Diseño Gráfico",
-    image: "https://ui-avatars.com/api/?name=Agostina+Morey&size=400&background=b5c48a&color=3d4a2a&bold=true",
+    image: "/agos.png",
     bio: "Coordinadora del área de diseño gráfico de Mack Studio.\n\nResponsable de liderar y desarrollar la identidad visual de Mack Studio y de cada uno de sus clientes, asegurando coherencia, calidad y una estética alineada a la estrategia de comunicación.\n\nTrabaja en la conceptualización y creación de piezas visuales que reflejan la esencia de cada marca: desde el desarrollo de branding e identidad, hasta el diseño de contenidos para redes sociales, campañas digitales y materiales gráficos.\n\nSu enfoque combina creatividad y criterio estratégico, logrando que cada diseño no solo se vea bien, sino que comunique con claridad y propósito.",
   },
   {
     name: "Sofia Presa",
     role: "Comunicación Visual y Redes Sociales",
-    image: "/sofia.jpeg",
+    image: "/sofia.jpg",
     bio: "Se especializa en la creación de contenido visual y la gestión de redes sociales, combinando diseño y comunicación para desarrollar piezas atractivas y funcionales.\n\nAcompaña la ejecución diaria de los proyectos, diseñando contenidos para redes y adaptando cada pieza a la identidad de marca de nuestros clientes. Su trabajo aporta dinamismo, coherencia visual y rapidez en la producción de contenido, contribuyendo a una comunicación efectiva y consistente.",
   },
   {
@@ -245,7 +245,7 @@ const HomePage = () => {
     {
       id: "inicio",
       bgColorClass: "bg-background",
-      bgImage: "url('/fondo_claro_mack.png')",
+      bgImage: "url('/fondo_claro_mack.svg')",
       scrollWeight: 0.8,
       content: (
         <div id="inicio" className="w-full px-6 md:px-12 pt-24 pb-16 flex flex-col justify-center items-center">
@@ -277,7 +277,7 @@ const HomePage = () => {
     {
       id: "mision",
       bgColorClass: "bg-primary",
-      bgImage: "url('/fondo_verde_oscuro_mack.png')",
+      bgImage: "url('/fondo_verde_oscuro_mack.svg')",
       theme: "dark",
       scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
       content: (
@@ -320,7 +320,7 @@ const HomePage = () => {
     {
       id: "nosotros",
       bgColorClass: "bg-secondary",
-      bgImage: "url('/fondo_verde_claro_mack.png')",
+      bgImage: "url('/fondo_verde_claro_mack.svg')",
       theme: "light",
       scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
       content: (
@@ -360,7 +360,7 @@ const HomePage = () => {
     {
       id: "clientes",
       bgColorClass: "bg-primary",
-      bgImage: "url('/fondo_verde_oscuro_mack.png')",
+      bgImage: "url('/fondo_verde_oscuro_mack.svg')",
       theme: "dark",
       scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
       content: (
@@ -393,7 +393,7 @@ const HomePage = () => {
     ...testimonials.map((t, i) => ({
       id: `experiencia-${i}`,
       bgColorClass: "bg-primary",
-      bgImage: "url('/fondo_verde_oscuro_mack.png')",
+      bgImage: "url('/fondo_verde_oscuro_mack.svg')",
       theme: "dark",
       isStack: true,
       scrollWeight: 0.6,
@@ -447,7 +447,7 @@ const HomePage = () => {
     {
       id: "servicios",
       bgColorClass: "bg-background",
-      bgImage: "url('/fondo_claro_mack.png')",
+      bgImage: "url('/fondo_claro_mack.svg')",
       scrollWeight: typeof window !== "undefined" && window.innerWidth < 768 ? 1.5 : 0.8,
       content: <ServicesSectionContent index={4 + testimonials.length} setSelectedService={setSelectedService} />,
     },
@@ -455,7 +455,7 @@ const HomePage = () => {
     {
       id: "contacto",
       bgColorClass: "bg-background",
-      bgImage: "url('/fondo_verde_claro_mack.png')",
+      bgImage: "url('/fondo_verde_claro_mack.svg')",
       scrollWeight: 0.8,
       content: (
         <div className="w-full px-6 md:px-12 flex flex-col justify-center items-center h-full">
