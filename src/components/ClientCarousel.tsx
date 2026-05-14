@@ -16,6 +16,9 @@ const clients = [
   { name: "SyG", logo: "/clients/syg.png" },
   { name: "Vet San Jose", logo: "/clients/vet.sanjose.png" },
   { name: "Vetifarma", logo: "/clients/vetifarma.png" },
+  { name: "Bianco", logo: "/clients/bianco.jpg" },
+  { name: "IMEB", logo: "/clients/imeb.jpg" }
+
 ];
 
 const ClientCarousel = () => {

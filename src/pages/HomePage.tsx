@@ -41,7 +41,7 @@ const teamMembers = [
   {
     name: "Juan Ignacio Suarez",
     role: "Desarrollo Web",
-    image: "/juanignaciosuarez.PNG",
+    image: "/juaniprueba4.jpg",
     bio: "Responsable del desarrollo de los proyectos digitales de Mack Studio, enfocado en crear sitios web modernos, funcionales y alineados a los objetivos de cada marca.\n\nDiseña y desarrolla plataformas optimizadas en rendimiento, asegurando una experiencia de usuario clara, ágil y profesional. Su trabajo garantiza que la presencia online de cada cliente no solo sea visualmente atractiva, sino también estratégica y efectiva.",
   },
 ];
