@@ -37,6 +37,12 @@ export const useEndSnapMarker = (contentRef: RefObject<HTMLElement>) => {
     if (!contentEl || !sectionEl) return;
 
     const measure = () => {
+      // A momentarily 0 (or otherwise absurd) viewport height — e.g. a tab
+      // that isn't actually visible yet — would otherwise compute a garbage
+      // marker position; skip and wait for a later, valid re-measurement
+      // instead of trusting it.
+      if (window.innerHeight < 100) return;
+
       const sectionTop = sectionEl.getBoundingClientRect().top;
       const contentBottom = contentEl.getBoundingClientRect().bottom;
       const contentBottomRelative = contentBottom - sectionTop;
