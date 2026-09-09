@@ -1,11 +1,13 @@
 import { Linkedin, Instagram, Send, X, ArrowUp, ChevronDown, Star } from "lucide-react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { useState, useRef, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState, useEffect } from "react";
 
 import ScrollReveal from "@/components/ScrollReveal";
 
 import ClientCarousel from "@/components/ClientCarousel";
-import CylinderScroll, { StickySection, useStickyScroll } from "@/components/CylinderScroll";
+import TestimonialStack from "@/components/TestimonialStack";
+import SectionBackgrounds from "@/components/SectionBackgrounds";
+import { useActiveSection } from "@/hooks/useActiveSection";
 
 const teamMembers = [
   {
@@ -112,10 +114,6 @@ const servicesData = [
   },
 ];
 
-const cardAccents = [
-  "#8f9d67", "#5a6b41", "#b5c48a", "#6b7c4e", "#8f9d67", "#4a5a35", "#a0b077", "#5a6b41", "#8f9d67"
-];
-
 const testimonials = [
   {
     name: "Best Gym",
@@ -137,50 +135,24 @@ const testimonials = [
   },
 ];
 
-const ServicesSectionContent = ({ index, setSelectedService }: { index: number, setSelectedService: (i: number) => void }) => {
-  const { scrollYProgress, positions } = useStickyScroll();
-  const p = positions[index]?.startP || 0;
-  const d = positions[index]?.duration || 0;
+// Fuente única con la info de cada sección: qué tema (claro/oscuro) le
+// corresponde al Navbar, y qué fondo pinta SectionBackgrounds ahí — así los
+// fondos siempre están en el mismo orden/lista que usa la detección de
+// sección activa, sin repetir la data en dos lugares.
+// "experiencia-0" es el id del <TestimonialStack>, que ocupa una sola sección.
+const SECTIONS = [
+  { id: "inicio", theme: "light" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_claro_mack.svg')" },
+  { id: "mision", theme: "dark" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
+  { id: "nosotros", theme: "light" as const, bgColorClass: "bg-secondary", bgImage: "url('/fondo_verde_claro_mack.svg')" },
+  { id: "clientes", theme: "dark" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
+  { id: "experiencia-0", theme: "dark" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
+  { id: "servicios", theme: "light" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_claro_mack.svg')" },
+  { id: "contacto", theme: "light" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_verde_claro_mack.svg')" },
+];
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [yEnd, setYEnd] = useState(0);
-
-  useEffect(() => {
-    const updateRange = () => {
-      if (containerRef.current && window.innerWidth < 768) {
-        // Obtenemos la altura real exacta del contenedor de servicios
-        const contentHeight = containerRef.current.scrollHeight;
-        const windowHeight = window.innerHeight;
-
-        // Calculamos cuánto tiene que subir exactamente.
-        // Restamos 600 para que haya mucho espacio después del último servicio antes de transicionar
-        const exactScrollDistance = windowHeight - contentHeight - 400;
-
-        setYEnd(Math.min(0, exactScrollDistance));
-      } else {
-        setYEnd(0);
-      }
-    };
-
-    // Le damos un pequeño delay para asegurar que los estilos/fuentes estén aplicados
-    setTimeout(updateRange, 100);
-    window.addEventListener('resize', updateRange);
-    return () => window.removeEventListener('resize', updateRange);
-  }, []);
-
-  // Animamos desde 0 (posición inicial) hasta yEnd (altura exacta).
-  // Hacemos que termine al 85% de la duración (p + d * 0.85) para que llegue al fondo 
-  // ANTES de que el efecto cilindro empiece a desvanecer la sección.
-  const y = useTransform(scrollYProgress, [p, p + d * 0.85], [0, yEnd]);
-
+const ServicesSectionContent = ({ setSelectedService }: { setSelectedService: (i: number) => void }) => {
   return (
-    <motion.div
-      ref={containerRef}
-      // En móvil: pt-[30vh] para que empiece más abajo, y absolute para el scroll.
-      // En desktop: relative, md:pt-0 md:py-24 md:justify-center md:min-h-[100vh] para centrarlo.
-      className="w-full px-6 md:px-12 flex flex-col justify-start md:justify-center items-center pt-[30vh] pb-[15vh] md:pt-0 md:pb-0 md:py-24 md:min-h-[100vh] absolute md:relative top-0 left-0 right-0"
-      style={{ y }}
-    >
+    <div className="w-full px-6 md:px-12 py-16 md:py-24">
       <div className="max-w-[1400px] w-full mx-auto">
         <ScrollReveal>
           <h2
@@ -215,7 +187,7 @@ const ServicesSectionContent = ({ index, setSelectedService }: { index: number, 
           ))}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -223,6 +195,8 @@ const HomePage = () => {
   const [selectedMember, setSelectedMember] = useState<number | null>(null);
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useActiveSection(SECTIONS);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -241,286 +215,210 @@ const HomePage = () => {
   };
   const closeModal = () => setSelectedMember(null);
 
-  const sections: StickySection[] = [
-    {
-      id: "inicio",
-      bgColorClass: "bg-background",
-      bgImage: "url('/fondo_claro_mack.svg')",
-      scrollWeight: 0.8,
-      content: (
-        <div id="inicio" className="w-full px-6 md:px-12 pt-24 pb-16 flex flex-col justify-center items-center">
-          <div className="max-w-[1400px] w-full mx-auto">
-            <ScrollReveal>
-              <img
-                src="/Logo-DarkGreen-01.svg"
-                alt="Mack Studio"
-                className="w-auto object-contain -ml-1"
-                style={{
-                  height: "clamp(5rem, 16vw, 13rem)",
-                }}
-              />
+  return (
+    // Sin fondo propio: si este wrapper pintara un color acá, taparía a
+    // SectionBackgrounds (fixed, detrás de todo) en TODO el alto de la
+    // página, ya que es un elemento normal (no positioned) más grande que
+    // cualquier sección — exactamente lo que borraba los fondos.
+    <div>
+      <SectionBackgrounds sections={SECTIONS} />
+
+      <section
+        id="inicio"
+        className="snap-section relative w-full flex flex-col justify-center items-center px-6 md:px-12 pt-24 pb-16"
+      >
+        <div className="max-w-[1400px] w-full mx-auto">
+          <ScrollReveal>
+            <img
+              src="/Logo-DarkGreen-01.svg"
+              alt="Mack Studio"
+              className="w-auto object-contain -ml-1"
+              style={{
+                height: "clamp(5rem, 16vw, 13rem)",
+              }}
+            />
+          </ScrollReveal>
+          <ScrollReveal delay={0.2}>
+            <p className="text-base md:text-lg text-foreground/80 mt-8 max-w-2xl leading-relaxed">
+              Somos tu equipo estratégico de Agromarketing y Comunicación. Sabemos el esfuerzo que hay detrás de cada empresa, por eso queremos contar tu historia ayudándote a conectar con tu audiencia. Impulsamos tu marca y conectamos el Agro con las personas a través del marketing digital.
+            </p>
+          </ScrollReveal>
+          <ScrollReveal delay={0.3}>
+            <p className="text-sm md:text-base text-foreground/60 mt-8 max-w-xl italic leading-relaxed">
+              "Somos la agencia que entiende de agro y de comunicación porque nacimos en el campo" <span className="not-italic font-semibold">El agro, pero con estrategia.</span>
+            </p>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      <section
+        id="mision"
+        className="snap-section relative w-full flex flex-col justify-center items-center px-6 md:px-12 py-12 md:py-32"
+      >
+        <div className="max-w-[1400px] w-full mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-20">
+            <ScrollReveal delay={0.1}>
+              <h2
+                className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-6 md:mb-16"
+                style={{ fontSize: "clamp(2rem, 8vw, 5rem)" }}
+              >
+                Misión.
+              </h2>
+              <p className="text-[13px] md:text-lg text-secondary-foreground/90 leading-snug md:leading-relaxed mb-3 md:mb-4">
+                En Mack Studio acompañamos a las marcas del agro y otros sectores a comunicar con autenticidad, contando la historia que hay detrás de cada proyecto.
+              </p>
+              <p className="text-[13px] md:text-lg text-secondary-foreground/90 leading-snug md:leading-relaxed">
+                Nuestra misión es crear estrategias creativas y efectivas, combinando comunicación, marketing y diseño con un profundo conocimiento técnico del campo, para lograr que cada empresa conecte de manera real con su audiencia.
+              </p>
             </ScrollReveal>
             <ScrollReveal delay={0.2}>
-              <p className="text-base md:text-lg text-foreground/80 mt-8 max-w-2xl leading-relaxed">
-                Somos tu equipo estratégico de Agromarketing y Comunicación. Sabemos el esfuerzo que hay detrás de cada empresa, por eso queremos contar tu historia ayudándote a conectar con tu audiencia. Impulsamos tu marca y conectamos el Agro con las personas a través del marketing digital.
-              </p>
-            </ScrollReveal>
-            <ScrollReveal delay={0.3}>
-              <p className="text-sm md:text-base text-foreground/60 mt-8 max-w-xl italic leading-relaxed">
-                "Somos la agencia que entiende de agro y de comunicación porque nacimos en el campo" <span className="not-italic font-semibold">El agro, pero con estrategia.</span>
-              </p>
-            </ScrollReveal>
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: "mision",
-      bgColorClass: "bg-primary",
-      bgImage: "url('/fondo_verde_oscuro_mack.svg')",
-      theme: "dark",
-      scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
-      content: (
-        <div className="w-full px-6 md:px-12 py-12 md:py-32 flex flex-col justify-center items-center">
-          <div className="max-w-[1400px] w-full mx-auto">
-            <div className="grid md:grid-cols-2 gap-8 md:gap-20">
-              <ScrollReveal delay={0.1}>
-                <h2
-                  className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-6 md:mb-16"
-                  style={{ fontSize: "clamp(2rem, 8vw, 5rem)" }}
-                >
-                  Misión.
-                </h2>
-                <p className="text-[13px] md:text-lg text-secondary-foreground/90 leading-snug md:leading-relaxed mb-3 md:mb-4">
-                  En Mack Studio acompañamos a las marcas del agro y otros sectores a comunicar con autenticidad, contando la historia que hay detrás de cada proyecto.
-                </p>
-                <p className="text-[13px] md:text-lg text-secondary-foreground/90 leading-snug md:leading-relaxed">
-                  Nuestra misión es crear estrategias creativas y efectivas, combinando comunicación, marketing y diseño con un profundo conocimiento técnico del campo, para lograr que cada empresa conecte de manera real con su audiencia.
-                </p>
-              </ScrollReveal>
-              <ScrollReveal delay={0.2}>
-                <h2
-                  className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-6 md:mb-16 mt-8 md:mt-0"
-                  style={{ fontSize: "clamp(2rem, 8vw, 5rem)" }}
-                >
-                  Visión.
-                </h2>
-                <p className="text-[13px] md:text-lg text-secondary-foreground/90 leading-snug md:leading-relaxed mb-3 md:mb-4">
-                  Ser la agencia de agromarketing y comunicación líder, reconocida por dar voz a quienes producen y por transformar el esfuerzo de las empresas en marcas sólidas, cercanas e innovadoras.
-                </p>
-                <p className="text-[13px] md:text-lg text-secondary-foreground/90 leading-snug md:leading-relaxed">
-                  Queremos consolidarnos como un aliado estratégico del sector agropecuario, llevando la comunicación a un nivel más humano, técnico y creativo, que inspire confianza y crecimiento sostenido.
-                </p>
-              </ScrollReveal>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: "nosotros",
-      bgColorClass: "bg-secondary",
-      bgImage: "url('/fondo_verde_claro_mack.svg')",
-      theme: "light",
-      scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
-      content: (
-        <div id="nosotros" className="w-full h-full flex flex-col justify-center items-center px-6 md:px-12 py-20">
-          <div className="max-w-[1400px] w-full mx-auto">
-            <ScrollReveal>
               <h2
-                className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-10 md:mb-16"
-                style={{ fontSize: "clamp(2rem, 10vw, 8rem)" }}
+                className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-6 md:mb-16 mt-8 md:mt-0"
+                style={{ fontSize: "clamp(2rem, 8vw, 5rem)" }}
               >
-                Nuestro equipo.
+                Visión.
               </h2>
+              <p className="text-[13px] md:text-lg text-secondary-foreground/90 leading-snug md:leading-relaxed mb-3 md:mb-4">
+                Ser la agencia de agromarketing y comunicación líder, reconocida por dar voz a quienes producen y por transformar el esfuerzo de las empresas en marcas sólidas, cercanas e innovadoras.
+              </p>
+              <p className="text-[13px] md:text-lg text-secondary-foreground/90 leading-snug md:leading-relaxed">
+                Queremos consolidarnos como un aliado estratégico del sector agropecuario, llevando la comunicación a un nivel más humano, técnico y creativo, que inspire confianza y crecimiento sostenido.
+              </p>
             </ScrollReveal>
-            <div className="flex flex-wrap justify-center gap-y-8 md:gap-10">
-              {teamMembers.map((member, i) => (
-                <div key={i} className="w-1/3 md:w-auto flex flex-col items-center px-1.5 md:px-0">
-                  <ScrollReveal delay={i * 0.08}>
-                    <div
-                      className="flex flex-col items-center text-center cursor-pointer group w-full md:w-44"
-                      onClick={() => handleCardClick(i)}
-                    >
-                      <div className="w-full aspect-square md:w-40 md:h-40 rounded-full overflow-hidden mb-3 md:mb-4 ring-4 ring-transparent group-hover:ring-secondary-foreground/40 transition-all duration-300 group-hover:scale-105 transform shadow-lg">
-                        <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
-                      </div>
-                      <h3 className="text-xs md:text-base font-bold text-secondary-foreground leading-tight">{member.name}</h3>
-                      <p className="text-[9px] md:text-xs text-secondary-foreground/60 mt-0.5 md:mt-1 uppercase tracking-wider leading-relaxed">{member.role}</p>
-                      <p className="text-[9px] md:text-xs text-secondary-foreground/40 mt-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">Saber más →</p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="nosotros"
+        className="snap-section relative w-full flex flex-col justify-center items-center px-6 md:px-12 py-20"
+      >
+        <div className="max-w-[1400px] w-full mx-auto">
+          <ScrollReveal>
+            <h2
+              className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-10 md:mb-16"
+              style={{ fontSize: "clamp(2rem, 10vw, 8rem)" }}
+            >
+              Nuestro equipo.
+            </h2>
+          </ScrollReveal>
+          <div className="flex flex-wrap justify-center gap-y-8 md:gap-10">
+            {teamMembers.map((member, i) => (
+              <div key={i} className="w-1/3 md:w-auto flex flex-col items-center px-1.5 md:px-0">
+                <ScrollReveal delay={i * 0.08}>
+                  <div
+                    className="flex flex-col items-center text-center cursor-pointer group w-full md:w-44"
+                    onClick={() => handleCardClick(i)}
+                  >
+                    <div className="w-full aspect-square md:w-40 md:h-40 rounded-full overflow-hidden mb-3 md:mb-4 ring-4 ring-transparent group-hover:ring-secondary-foreground/40 transition-all duration-300 group-hover:scale-105 transform shadow-lg">
+                      <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
                     </div>
-                  </ScrollReveal>
-                </div>
-              ))}
-            </div>
+                    <h3 className="text-xs md:text-base font-bold text-secondary-foreground leading-tight">{member.name}</h3>
+                    <p className="text-[9px] md:text-xs text-secondary-foreground/60 mt-0.5 md:mt-1 uppercase tracking-wider leading-relaxed">{member.role}</p>
+                    <p className="text-[9px] md:text-xs text-secondary-foreground/40 mt-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">Saber más →</p>
+                  </div>
+                </ScrollReveal>
+              </div>
+            ))}
           </div>
         </div>
-      ),
-    },
-    {
-      id: "clientes",
-      bgColorClass: "bg-primary",
-      bgImage: "url('/fondo_verde_oscuro_mack.svg')",
-      theme: "dark",
-      scrollWeight: typeof window !== "undefined" ? 0.6 : 0.6,
-      content: (
-        <div className="w-full px-6 md:px-12 flex flex-col justify-center items-center h-full">
-          <div className="max-w-[1400px] w-full mx-auto">
-            <ScrollReveal>
-              <h2
-                className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-6 md:mb-10"
-                style={{ fontSize: "clamp(2rem, 10vw, 8rem)" }}
+      </section>
+
+      <section
+        id="clientes"
+        className="snap-section relative w-full flex flex-col justify-center items-center px-6 md:px-12"
+      >
+        <div className="max-w-[1400px] w-full mx-auto">
+          <ScrollReveal>
+            <h2
+              className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-6 md:mb-10"
+              style={{ fontSize: "clamp(2rem, 10vw, 8rem)" }}
+            >
+              Nuestros clientes.
+            </h2>
+            <p className="text-sm md:text-lg text-primary-foreground/70 max-w-xl leading-relaxed mb-10 md:mb-16">
+              Trabajamos con las principales empresas del sector agroindustrial, construyendo relaciones de confianza a largo plazo.
+            </p>
+          </ScrollReveal>
+
+          {/* Cartera de Clientes - Carousel */}
+          <ScrollReveal>
+            <h3 className="text-xl md:text-3xl font-bold text-secondary-foreground text-center mb-8 md:mb-12">
+              Cartera de Clientes
+            </h3>
+            <ClientCarousel />
+          </ScrollReveal>
+        </div>
+      </section>
+
+      <TestimonialStack testimonials={testimonials} />
+
+      <section
+        id="servicios"
+        className="snap-section relative w-full flex flex-col justify-center items-center"
+      >
+        <ServicesSectionContent setSelectedService={setSelectedService} />
+      </section>
+
+      <section
+        id="contacto"
+        className="snap-section relative w-full flex flex-col justify-center items-center px-6 md:px-12"
+      >
+        <div className="max-w-[1400px] w-full mx-auto">
+          <ScrollReveal>
+            <div className="flex flex-col md:flex-row md:flex-wrap gap-8 md:gap-14 items-center justify-center">
+              {/* WhatsApp */}
+              <a
+                href="https://wa.me/5492266449690"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center group"
               >
-                Nuestros clientes.
-              </h2>
-              <p className="text-sm md:text-lg text-primary-foreground/70 max-w-xl leading-relaxed mb-10 md:mb-16">
-                Trabajamos con las principales empresas del sector agroindustrial, construyendo relaciones de confianza a largo plazo.
-              </p>
-            </ScrollReveal>
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-white flex items-center justify-center mb-4 text-white group-hover:bg-white group-hover:text-background transition-all duration-300">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 md:w-12 md:h-12">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                  </svg>
+                </div>
+                <span className="text-xs md:text-sm font-bold tracking-wider text-white">WhatsApp</span>
+              </a>
 
-            {/* Cartera de Clientes - Carousel */}
-            <ScrollReveal>
-              <h3 className="text-xl md:text-3xl font-bold text-secondary-foreground text-center mb-8 md:mb-12">
-                Cartera de Clientes
-              </h3>
-              <ClientCarousel />
-            </ScrollReveal>
-          </div>
-        </div>
-      ),
-    },
-    // EXPERIENCIAS STACKED SECTIONS
-    ...testimonials.map((t, i) => ({
-      id: `experiencia-${i}`,
-      bgColorClass: "bg-primary",
-      bgImage: "url('/fondo_verde_oscuro_mack.svg')",
-      theme: "dark",
-      isStack: true,
-      scrollWeight: 0.6,
-      content: (
-        <div className="w-full h-full flex flex-col items-center justify-center px-6 md:px-12">
-          {i === 0 && (
-            <div className="absolute top-[20%] md:top-[15%] left-0 w-full px-6 md:px-12 pointer-events-none mb-12">
-              <div className="max-w-[1400px] w-full mx-auto">
-                <h2
-                  className="font-bold text-secondary-foreground leading-[0.85] tracking-tight"
-                  style={{ fontSize: "clamp(2rem, 10vw, 8rem)" }}
-                >
-                  Experiencias.
-                </h2>
-              </div>
+              {/* Mail */}
+              <a href="mailto:mackstudio.cm@gmail.com" className="flex flex-col items-center group">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-white flex items-center justify-center mb-4 text-white group-hover:bg-white group-hover:text-background transition-all duration-300">
+                  <Send size={40} className="md:w-12 md:h-12" />
+                </div>
+                <span className="text-xs md:text-sm font-bold tracking-wider text-white">Email</span>
+              </a>
+
+              {/* LinkedIn */}
+              <a href="https://www.linkedin.com/company/mack-studio-agromarketing/" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center group">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-white flex items-center justify-center mb-4 text-white group-hover:bg-white group-hover:text-background transition-all duration-300">
+                  <Linkedin size={40} className="md:w-12 md:h-12" />
+                </div>
+                <span className="text-xs md:text-sm font-bold tracking-wider text-white">LinkedIn</span>
+              </a>
+
+              {/* Instagram */}
+              <a href="https://www.instagram.com/mackstudio.cm/" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center group">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-white flex items-center justify-center mb-4 text-white group-hover:bg-white group-hover:text-background transition-all duration-300">
+                  <Instagram size={40} className="md:w-12 md:h-12" />
+                </div>
+                <span className="text-xs md:text-sm font-bold tracking-wider text-white">Instagram</span>
+              </a>
+
+              {/* TikTok */}
+              <a href="https://www.tiktok.com/@mackstudio.cm" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center group">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-white flex items-center justify-center mb-4 text-white group-hover:bg-white group-hover:text-background transition-all duration-300">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 md:w-12 md:h-12">
+                    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z" />
+                  </svg>
+                </div>
+                <span className="text-xs md:text-sm font-bold tracking-wider text-white">TikTok</span>
+              </a>
             </div>
-          )}
-          <div className="max-w-xl w-full mx-auto relative z-10 mt-48 md:mt-40">
-            {/* Logo superpuesto rectangular */}
-            <div className="absolute left-1/2 -top-12 -translate-x-1/2 w-48 h-24 bg-white rounded-2xl shadow-sm flex items-center justify-center z-20 overflow-hidden px-4">
-              {t.logo ? (
-                <img src={t.logo} alt={t.name} className="w-full h-full object-contain" />
-              ) : (
-                <span className="text-primary text-xl font-black uppercase text-center leading-tight">
-                  {t.name}
-                </span>
-              )}
-            </div>
-
-            {/* Tarjeta blanca sólida con texto oscuro y estrellas doradas */}
-            <div className="bg-white rounded-[30px] p-6 md:p-10 pt-16 md:pt-16 shadow-2xl relative">
-              <h3 className="text-lg md:text-2xl font-black text-primary text-center uppercase tracking-widest mb-3 md:mb-4">
-                {t.name}
-              </h3>
-
-              <p className="text-[13px] md:text-lg text-primary/90 font-medium leading-snug md:leading-relaxed text-center">
-                "{t.text}"
-              </p>
-
-              {/* 5 estrellas agregadas al final */}
-              <div className="flex justify-center gap-1 mt-6">
-                {Array.from({ length: 5 }).map((_, j) => (
-                  <Star key={j} size={16} className="fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-            </div>
-          </div>
+          </ScrollReveal>
         </div>
-      )
-    })),
-    {
-      id: "servicios",
-      bgColorClass: "bg-background",
-      bgImage: "url('/fondo_claro_mack.svg')",
-      scrollWeight: typeof window !== "undefined" && window.innerWidth < 768 ? 1.5 : 0.8,
-      content: <ServicesSectionContent index={4 + testimonials.length} setSelectedService={setSelectedService} />,
-    },
-    // CONTACT SECTION
-    {
-      id: "contacto",
-      bgColorClass: "bg-background",
-      bgImage: "url('/fondo_verde_claro_mack.svg')",
-      scrollWeight: 0.8,
-      content: (
-        <div className="w-full px-6 md:px-12 flex flex-col justify-center items-center h-full">
-          <div className="max-w-[1400px] w-full mx-auto">
-            <ScrollReveal>
-              <div className="flex flex-col md:flex-row md:flex-wrap gap-6 md:gap-10 items-center justify-center">
-                {/* WhatsApp */}
-                <a
-                  href="https://wa.me/5492266449690"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center group"
-                >
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-white flex items-center justify-center mb-4 text-white group-hover:bg-white group-hover:text-green-500 transition-all duration-300">
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 md:w-12 md:h-12">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                    </svg>
-                  </div>
-                  <span className="text-xs md:text-sm font-bold tracking-wider text-white">+54 9 2266 449690</span>
-                </a>
-
-                {/* Mail */}
-                <a href="mailto:mackstudio.cm@gmail.com" className="flex flex-col items-center group">
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-white flex items-center justify-center mb-4 text-white group-hover:bg-white group-hover:text-background transition-all duration-300">
-                    <Send size={40} className="md:w-12 md:h-12" />
-                  </div>
-                  <span className="text-xs md:text-sm font-bold tracking-wider text-white">mackstudio.cm@gmail.com</span>
-                </a>
-
-                {/* LinkedIn */}
-                <a href="https://www.linkedin.com/company/mack-studio-agromarketing/" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center group">
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-white flex items-center justify-center mb-4 text-white group-hover:bg-white group-hover:text-background transition-all duration-300">
-                    <Linkedin size={40} className="md:w-12 md:h-12" />
-                  </div>
-                  <span className="text-xs md:text-sm font-bold tracking-wider text-white">LinkedIn</span>
-                </a>
-
-                {/* Instagram */}
-                <a href="https://www.instagram.com/mackstudio.cm/" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center group">
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-white flex items-center justify-center mb-4 text-white group-hover:bg-white group-hover:text-background transition-all duration-300">
-                    <Instagram size={40} className="md:w-12 md:h-12" />
-                  </div>
-                  <span className="text-xs md:text-sm font-bold tracking-wider text-white">@mackstudio.cm</span>
-                </a>
-
-                {/* TikTok */}
-                <a href="https://www.tiktok.com/@mackstudio.cm" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center group">
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-white flex items-center justify-center mb-4 text-white group-hover:bg-white group-hover:text-background transition-all duration-300">
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 md:w-12 md:h-12">
-                      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z" />
-                    </svg>
-                  </div>
-                  <span className="text-xs md:text-sm font-bold tracking-wider text-white">@mackstudio.cm</span>
-                </a>
-              </div>
-            </ScrollReveal>
-          </div>
-        </div>
-      ),
-    },
-  ];
-
-  return (
-    <div className="bg-black">
-      <CylinderScroll sections={sections} />
+      </section>
 
       {/* Team Member Modal */}
       {selectedMember !== null && (

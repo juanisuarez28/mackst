@@ -15,36 +15,33 @@ const Navbar = () => {
   const [theme, setTheme] = useState("light"); // "light" or "dark" based on background
 
   useEffect(() => {
-    // Escuchar el cambio de tema emitido por CylinderScroll
+    // Escuchar el cambio de tema emitido por useActiveSection (HomePage)
     const handleThemeChange = (e: Event) => {
       const customEvent = e as CustomEvent;
       setTheme(customEvent.detail);
     };
 
-    window.addEventListener("theme-change", handleThemeChange);
-    
-    // Fallback scroll listener just to update activeSection based on offset top
-    // Since we now use anchors that have native offsetTop, this will still work!
-    const handleScroll = () => {
-      const sections = navItems.map((item) => {
-        const el = document.getElementById(item.target);
-        if (!el) return { id: item.target, top: 0 };
-        return { id: item.target, top: el.offsetTop };
-      });
-
-      const scrollPos = window.scrollY + window.innerHeight / 2; // Mid screen
-      for (let i = sections.length - 1; i >= 0; i--) {
-        if (scrollPos >= sections[i].top) {
-          setActiveSection(sections[i].id);
-          break;
-        }
+    // Escuchar el cambio de sección activa, también emitido por useActiveSection
+    // (un IntersectionObserver en HomePage que sabe qué sección está centrada
+    // en la pantalla). Algunas secciones (mision, experiencia-0) no tienen
+    // botón propio en el navbar, así que se agrupan bajo el botón anterior
+    // más cercano.
+    const handleSectionChange = (e: Event) => {
+      const id = (e as CustomEvent).detail as string;
+      if (navItems.some((item) => item.target === id)) {
+        setActiveSection(id);
+      } else if (id === "mision") {
+        setActiveSection("inicio");
+      } else if (id.startsWith("experiencia-")) {
+        setActiveSection("clientes");
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("theme-change", handleThemeChange);
+    window.addEventListener("section-change", handleSectionChange);
     return () => {
-      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("theme-change", handleThemeChange);
+      window.removeEventListener("section-change", handleSectionChange);
     };
   }, []);
 

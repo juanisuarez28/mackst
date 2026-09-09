@@ -66,5 +66,35 @@
 
   html {
     scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+  }
+}
+
+@layer utilities {
+  /* One "page" of the site: settles the browser here when a scroll gesture
+     ends nearby, so a section is never left half-transitioned. min-height
+     (not height) lets a section grow taller than one viewport when its own
+     content needs more room (e.g. the mobile services list) — it just keeps
+     scrolling normally inside itself before the next section can snap in. */
+  .snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    min-height: 100vh;
+    min-height: 100svh; /* stays put across mobile browsers showing/hiding their URL bar */
+  }
+
+  /* A zero-size snap target with no height/layout footprint of its own —
+     for adding extra mandatory stops INSIDE a section (e.g. one per card in
+     the testimonial stack) without affecting that section's own sizing. */
+  .snap-point {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  /* Exactly one viewport tall, for content meant to stay pinned (position:
+     sticky) while its surrounding section scrolls past it. */
+  .pin-viewport {
+    height: 100vh;
+    height: 100svh;
   }
 }
