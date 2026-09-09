@@ -133,13 +133,16 @@ const TestimonialStack = ({ testimonials }: TestimonialStackProps) => {
 
   return (
     <section id="experiencia-0" ref={containerRef} className="snap-section relative w-full" style={{ height: `${SECTION_HEIGHT_VH}vh` }}>
-      {/* Extra mandatory snap stops, one per card, centered on the point where
-          that card is the only one fully visible. Without these, only the
-          section's own start/end were snap points, so a scroll gesture could
-          let go anywhere in between — landing mid cross-fade with two cards
-          dim and overlapping. Zero-size, so they don't add any scroll length
-          of their own; they just mark extra places the browser is allowed to
-          rest, using the same scroll-snap machinery as every section boundary.
+      {/* Extra mandatory snap stops, spread through each card's own fully-
+          visible range (not just one per card). With only one stop per card,
+          a single strong scroll — especially scrolling back UP from
+          "servicios" into the last card — had ~60vh of empty space to sail
+          through before reaching a valid stop, and could overshoot the
+          whole section, landing back on the first card instead of the last.
+          Packing 3 stops into each card's safe plateau (inset from its own
+          cross-fade edges so none of them land mid-blend with a neighbor)
+          keeps every gap short enough that a swipe can't skip past it.
+          Zero-size, so they don't add scroll length of their own.
 
           Placement: scrollYProgress (0..1, used by every card's opacity/y/
           scale above) covers the scroll range from "section top hits
@@ -150,11 +153,20 @@ const TestimonialStack = ({ testimonials }: TestimonialStackProps) => {
           fraction of the section's own height: a target progress `val`
           lands at `val * (H-1)/H` of the way down the section, regardless of
           the actual viewport size. */}
-      {testimonials.map((_, i) => {
-        const targetProgress = (i + 0.5) / total;
+      {testimonials.flatMap((_, i) => {
+        const p = i / total;
+        const d = 1 / total;
+        const fadeWidth = d * 0.25;
+        const usableStart = p + fadeWidth;
+        const usableWidth = d - 2 * fadeWidth;
+        const MARKERS_PER_CARD = 3;
         const heightMultiple = SECTION_HEIGHT_VH / 100;
-        const topPercent = targetProgress * ((heightMultiple - 1) / heightMultiple) * 100;
-        return <div key={i} className="snap-point absolute left-0 w-full" style={{ top: `${topPercent}%` }} />;
+
+        return Array.from({ length: MARKERS_PER_CARD }, (_, k) => {
+          const targetProgress = usableStart + ((k + 0.5) / MARKERS_PER_CARD) * usableWidth;
+          const topPercent = targetProgress * ((heightMultiple - 1) / heightMultiple) * 100;
+          return <div key={`${i}-${k}`} className="snap-point absolute left-0 w-full" style={{ top: `${topPercent}%` }} />;
+        });
       })}
 
       <div className="sticky top-0 w-full pin-viewport overflow-hidden">

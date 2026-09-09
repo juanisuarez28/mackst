@@ -169,7 +169,14 @@ const ServicesSectionContent = ({ setSelectedService }: { setSelectedService: (i
             <ScrollReveal key={i} delay={i * 0.05}>
               <button
                 onClick={() => setSelectedService(i)}
-                className="w-full text-left p-3 md:p-6 rounded-[20px] md:rounded-[25px] border border-primary/20 hover:border-primary transition-all duration-300 group flex flex-col items-center text-center min-h-[90px] md:min-h-[140px] justify-center relative shadow-sm"
+                // max-md:snap-point: en mobile, la lista de 9 servicios es
+                // mucho más alta que una pantalla. Sin paradas intermedias,
+                // "servicios" y "contacto" quedan como los únicos dos puntos
+                // de snap "mandatory" del documento en ese tramo, así que un
+                // scroll con algo de impulso podía saltar directo a
+                // contacto sin llegar a mostrar los últimos servicios. Cada
+                // botón es ahora también una parada válida.
+                className="w-full text-left p-3 md:p-6 rounded-[20px] md:rounded-[25px] border border-primary/20 hover:border-primary transition-all duration-300 group flex flex-col items-center text-center min-h-[90px] md:min-h-[140px] justify-center relative shadow-sm max-md:snap-point"
                 style={{ background: "rgba(143, 157, 103, 0.05)" }}
               >
                 <div className="flex flex-col items-center justify-center">
@@ -373,11 +380,11 @@ const HomePage = () => {
 
       <section
         id="contacto"
-        className="snap-section relative w-full flex flex-col justify-center items-center px-6 md:px-12"
+        className="snap-section relative w-full flex flex-col justify-center items-center px-6 md:px-12 py-16 md:py-0"
       >
         <div className="max-w-[1400px] w-full mx-auto">
           <ScrollReveal>
-            <div className="flex flex-col md:flex-row md:flex-wrap gap-8 md:gap-14 items-center justify-center">
+            <div className="flex flex-col md:flex-row md:flex-wrap gap-6 md:gap-14 items-center justify-center">
               {/* WhatsApp */}
               <a
                 href="https://wa.me/5492266449690"
