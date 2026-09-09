@@ -1,6 +1,6 @@
 import { Linkedin, Instagram, Send, X, ArrowUp, ChevronDown, Star } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -215,7 +215,35 @@ const HomePage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const scrollRestoreRef = useRef<{ cleanup: () => void } | null>(null);
+
   const scrollToTop = () => {
+    // scroll-snap-stop: always (used everywhere on the page — every section
+    // boundary, every service item, every testimonial card) forces ANY
+    // scroll operation to stop at each one it passes, including a
+    // programmatic window.scrollTo. From deep in the page that meant this
+    // button's "smooth" scroll kept getting caught on the way up, making it
+    // feel stuck/broken instead of just going to the top. Turning snapping
+    // off for the duration of this one scroll, then back on once it
+    // genuinely finishes (the native "scrollend" event, with a timeout as a
+    // fallback in case it doesn't fire), sidesteps that entirely.
+    scrollRestoreRef.current?.cleanup();
+
+    const html = document.documentElement;
+    html.style.scrollSnapType = "none";
+
+    let restored = false;
+    const restore = () => {
+      if (restored) return;
+      restored = true;
+      html.style.scrollSnapType = "";
+      window.removeEventListener("scrollend", restore);
+      clearTimeout(timeoutId);
+    };
+    const timeoutId = window.setTimeout(restore, 3000);
+    window.addEventListener("scrollend", restore, { once: true });
+    scrollRestoreRef.current = { cleanup: restore };
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -376,11 +404,22 @@ const HomePage = () => {
         style={{ justifyContent: "safe center" }}
       >
         <ServicesSectionContent setSelectedService={setSelectedService} />
+        {/* max-md:snap-point-end: en mobile, la lista de 9 servicios es más
+            alta que la pantalla. Sin esto, el último punto de snap "válido"
+            era el propio botón 9 alineado arriba de todo, dejando el resto
+            de esta sección (su padding) y el arranque de "Contacto" visibles
+            al mismo tiempo debajo — nunca se llegaba a hacer el salto limpio
+            a la siguiente sección. Esto marca el final real del contenido
+            para que, al llegar ahí, se alinee con el fondo de la pantalla
+            (la última card queda holgada, pasando la mitad) en vez de dejar
+            que la sección siguiente ya se empiece a ver.
+        */}
+        <div className="max-md:snap-point-end w-full h-0" />
       </section>
 
       <section
         id="contacto"
-        className="snap-section relative w-full flex flex-col justify-center items-center px-6 md:px-12 py-16 md:py-0"
+        className="snap-section-last relative w-full flex flex-col justify-center items-center px-6 md:px-12 py-16 md:py-0"
       >
         <div className="max-w-[1400px] w-full mx-auto">
           <ScrollReveal>

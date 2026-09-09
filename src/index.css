@@ -91,6 +91,25 @@
     scroll-snap-stop: always;
   }
 
+  /* Same idea, but aligns its END with the bottom of the screen instead of
+     its start with the top — for marking "here is the true end of this
+     section's content" right where it borders the next one, so scrolling
+     through a long section snaps to fully showing its tail end instead of
+     leaving room for the next section to peek in underneath. */
+  .snap-point-end {
+    scroll-snap-align: end;
+    scroll-snap-stop: always;
+  }
+
+  /* Like .snap-section but without forcing min-height: 100vh — for the LAST
+     section on the page, where forcing a full-viewport height would leave
+     scrollable empty space below its own (shorter) content, since nothing
+     ever renders that trailing space. */
+  .snap-section-last {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
   /* Exactly one viewport tall, for content meant to stay pinned (position:
      sticky) while its surrounding section scrolls past it. */
   .pin-viewport {

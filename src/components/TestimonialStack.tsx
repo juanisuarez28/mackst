@@ -16,7 +16,13 @@ interface TestimonialStackProps {
 
 const STACK_OFFSET = 12; // px offset between cards
 const STACK_SCALE = 0.03; // scale reduction per card sitting behind the front one
-const SECTION_HEIGHT_VH = 280; // local scroll distance given to the whole stack
+const SECTION_HEIGHT_VH = 220; // local scroll distance given to the whole stack — shorter
+// than before so there's less scroll distance overall (and less room for a
+// swipe to end up stuck mid-transition instead of on a snap point).
+const FADE_FRACTION = 0.15; // fraction of a card's own range spent cross-
+// fading with its neighbor — smaller than before so that "danger zone" where
+// two cards are visibly blended is narrower, both to shorten how long the
+// dissolve takes and to shrink the gap a scroll could get stuck inside.
 
 // A single card in the stack. Position/duration are fractions of this
 // section's OWN local scroll progress (0..1) — this effect never reads or
@@ -35,7 +41,7 @@ const StackedCard = ({
 }) => {
   const p = index / total;
   const d = 1 / total;
-  const fadeWidth = d * 0.25;
+  const fadeWidth = d * FADE_FRACTION;
   const isLast = index === total - 1;
 
   const opacity = useTransform(scrollYProgress, (val) => {
@@ -156,7 +162,7 @@ const TestimonialStack = ({ testimonials }: TestimonialStackProps) => {
       {testimonials.flatMap((_, i) => {
         const p = i / total;
         const d = 1 / total;
-        const fadeWidth = d * 0.25;
+        const fadeWidth = d * FADE_FRACTION;
         const usableStart = p + fadeWidth;
         const usableWidth = d - 2 * fadeWidth;
         const MARKERS_PER_CARD = 3;
