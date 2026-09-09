@@ -18,6 +18,15 @@ import { RefObject, useEffect, useState } from "react";
  * Returns `null` when the content already fits within one viewport — no
  * marker is needed there, the section's own start boundary already shows
  * all of it.
+ *
+ * Re-measuring is deliberately paranoid: on a real network (unlike a local
+ * dev server with everything cached), the web font can still be swapping in
+ * — a subtitle wrapping onto an extra line across nine buttons adds up to a
+ * real height change — well after mount, and that reflow was observed to
+ * NOT reliably reach either the ResizeObserver or a window "resize" event on
+ * its own. So on top of both of those, this also re-measures once
+ * `document.fonts.ready` resolves and a few more times over the following
+ * couple of seconds, to catch whatever else might shift layout late.
  */
 export const useEndSnapMarker = (contentRef: RefObject<HTMLElement>) => {
   const [topPx, setTopPx] = useState<number | null>(null);
@@ -37,6 +46,9 @@ export const useEndSnapMarker = (contentRef: RefObject<HTMLElement>) => {
 
     measure();
 
+    document.fonts?.ready?.then(measure).catch(() => {});
+    const timeouts = [150, 500, 1200, 2500].map((delay) => window.setTimeout(measure, delay));
+
     const resizeObserver = new ResizeObserver(measure);
     resizeObserver.observe(contentEl);
     resizeObserver.observe(sectionEl);
@@ -45,6 +57,7 @@ export const useEndSnapMarker = (contentRef: RefObject<HTMLElement>) => {
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", measure);
+      timeouts.forEach((id) => window.clearTimeout(id));
     };
   }, [contentRef]);
 

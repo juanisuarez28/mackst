@@ -38,13 +38,24 @@ const buildGroups = (sections: SectionBackground[]): Group[] => {
   return groups;
 };
 
-const BackgroundLayer = ({ group, scrollY }: { group: Group; scrollY: MotionValue<number> }) => {
+const BackgroundLayer = ({
+  group,
+  scrollY,
+  fadeWidth,
+}: {
+  group: Group;
+  scrollY: MotionValue<number>;
+  fadeWidth: number;
+}) => {
   // Crossfade over a slice of the viewport's own height — reads as a soft
   // dissolve at any screen size, but still resolves well within the quick
   // animated hop the scroll-snap does between sections.
+  // fadeWidth is computed once by the parent (recalculated only on resize)
+  // instead of inside this callback, which runs on every scroll frame for
+  // every background group — reading window.innerHeight that often was
+  // unnecessary work during the exact moment (scrolling) that needs to stay
+  // smooth.
   const opacity = useTransform(scrollY, (y) => {
-    const fadeWidth = Math.max(80, Math.min(window.innerHeight * 0.25, 220));
-
     if (y >= group.startPx && y <= group.endPx) return 1;
 
     if (y < group.startPx) {
@@ -86,10 +97,14 @@ const BackgroundLayer = ({ group, scrollY }: { group: Group; scrollY: MotionValu
  */
 const SectionBackgrounds = ({ sections }: { sections: SectionBackground[] }) => {
   const [groups, setGroups] = useState<Group[]>([]);
+  const [fadeWidth, setFadeWidth] = useState(160);
   const { scrollY } = useScroll();
 
   useEffect(() => {
-    const measure = () => setGroups(buildGroups(sections));
+    const measure = () => {
+      setGroups(buildGroups(sections));
+      setFadeWidth(Math.max(80, Math.min(window.innerHeight * 0.25, 220)));
+    };
 
     measure();
 
@@ -112,7 +127,7 @@ const SectionBackgrounds = ({ sections }: { sections: SectionBackground[] }) => 
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none">
       {groups.map((group, i) => (
-        <BackgroundLayer key={i} group={group} scrollY={scrollY} />
+        <BackgroundLayer key={i} group={group} scrollY={scrollY} fadeWidth={fadeWidth} />
       ))}
     </div>
   );
