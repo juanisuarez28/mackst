@@ -1,6 +1,6 @@
 import { Linkedin, Instagram, Send, X, ArrowUp, ChevronDown, Star } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, RefObject } from "react";
 
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -9,6 +9,7 @@ import TestimonialStack from "@/components/TestimonialStack";
 import SectionBackgrounds from "@/components/SectionBackgrounds";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { useSectionTheme } from "@/hooks/useSectionTheme";
+import { useEndSnapMarker } from "@/hooks/useEndSnapMarker";
 
 const teamMembers = [
   {
@@ -151,9 +152,15 @@ const SECTIONS = [
   { id: "contacto", theme: "white" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_verde_claro_mack.svg')" },
 ];
 
-const ServicesSectionContent = ({ setSelectedService }: { setSelectedService: (i: number) => void }) => {
+const ServicesSectionContent = ({
+  setSelectedService,
+  contentRef,
+}: {
+  setSelectedService: (i: number) => void;
+  contentRef: RefObject<HTMLDivElement>;
+}) => {
   return (
-    <div className="w-full px-6 md:px-12 pt-24 md:pt-28 pb-16 md:pb-24">
+    <div ref={contentRef} className="w-full px-6 md:px-12 pt-24 md:pt-28 pb-16 md:pb-24">
       <div className="max-w-[1400px] w-full mx-auto">
         <ScrollReveal>
           <h2
@@ -207,6 +214,14 @@ const HomePage = () => {
   useActiveSection(SECTIONS);
   const sectionTheme = useSectionTheme();
 
+  // Ver useEndSnapMarker: marca dónde termina el contenido real de cada
+  // sección para que, al llegar ahí, se vea completo terminando justo al
+  // fondo de la pantalla — nunca la sección siguiente asomando debajo.
+  const serviciosContentRef = useRef<HTMLDivElement>(null);
+  const serviciosEndTop = useEndSnapMarker(serviciosContentRef);
+  const contactoContentRef = useRef<HTMLDivElement>(null);
+  const contactoEndTop = useEndSnapMarker(contactoContentRef);
+
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 300);
@@ -215,36 +230,19 @@ const HomePage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollRestoreRef = useRef<{ cleanup: () => void } | null>(null);
-
   const scrollToTop = () => {
     // scroll-snap-stop: always (used everywhere on the page — every section
-    // boundary, every service item, every testimonial card) forces ANY
-    // scroll operation to stop at each one it passes, including a
-    // programmatic window.scrollTo. From deep in the page that meant this
-    // button's "smooth" scroll kept getting caught on the way up, making it
-    // feel stuck/broken instead of just going to the top. Turning snapping
-    // off for the duration of this one scroll, then back on once it
-    // genuinely finishes (the native "scrollend" event, with a timeout as a
-    // fallback in case it doesn't fire), sidesteps that entirely.
-    scrollRestoreRef.current?.cleanup();
-
-    const html = document.documentElement;
-    html.style.scrollSnapType = "none";
-
-    let restored = false;
-    const restore = () => {
-      if (restored) return;
-      restored = true;
-      html.style.scrollSnapType = "";
-      window.removeEventListener("scrollend", restore);
-      clearTimeout(timeoutId);
-    };
-    const timeoutId = window.setTimeout(restore, 3000);
-    window.addEventListener("scrollend", restore, { once: true });
-    scrollRestoreRef.current = { cleanup: restore };
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // boundary, every service item, every testimonial card) forces a
+    // continuous/animated scroll to stop at every one it passes through.
+    // A "smooth" scroll from deep in the page kept getting caught on the
+    // way up — and toggling scroll-snap-type off mid-animation to work
+    // around it raced with the browser's own "scrollend" timing, so the
+    // button would jump to the top and then get snapped straight back to
+    // where it started. An INSTANT jump sidesteps this cleanly: it isn't a
+    // continuous scroll passing through intermediate snap points, it's a
+    // single relocation straight to y=0 — which is already "inicio"'s own
+    // valid snap point, so there's nothing left to correct afterward.
+    window.scrollTo({ top: 0, behavior: "auto" });
   };
 
   const handleCardClick = (i: number) => {
@@ -403,25 +401,25 @@ const HomePage = () => {
         // alineado arriba en ese caso.
         style={{ justifyContent: "safe center" }}
       >
-        <ServicesSectionContent setSelectedService={setSelectedService} />
-        {/* max-md:snap-point-end: en mobile, la lista de 9 servicios es más
-            alta que la pantalla. Sin esto, el último punto de snap "válido"
-            era el propio botón 9 alineado arriba de todo, dejando el resto
-            de esta sección (su padding) y el arranque de "Contacto" visibles
-            al mismo tiempo debajo — nunca se llegaba a hacer el salto limpio
-            a la siguiente sección. Esto marca el final real del contenido
-            para que, al llegar ahí, se alinee con el fondo de la pantalla
-            (la última card queda holgada, pasando la mitad) en vez de dejar
-            que la sección siguiente ya se empiece a ver.
-        */}
-        <div className="max-md:snap-point-end w-full h-0" />
+        <ServicesSectionContent setSelectedService={setSelectedService} contentRef={serviciosContentRef} />
+        {/* Marca el final real del contenido (ver useEndSnapMarker): sin
+            esto, en mobile la lista de 9 servicios es más alta que la
+            pantalla y el último punto de snap "válido" era el propio botón 9
+            alineado arriba de todo, dejando el resto de esta sección (su
+            padding) y el arranque de "Contacto" visibles al mismo tiempo
+            debajo — nunca se llegaba a hacer el salto limpio a la siguiente
+            sección. Cuando el contenido ya entra en un viewport (desktop),
+            serviciosEndTop es null y esto no hace nada. */}
+        {serviciosEndTop !== null && (
+          <div className="snap-point absolute left-0 w-full pointer-events-none" style={{ top: `${serviciosEndTop}px` }} />
+        )}
       </section>
 
       <section
         id="contacto"
         className="snap-section-last relative w-full flex flex-col justify-center items-center px-6 md:px-12 py-16 md:py-0"
       >
-        <div className="max-w-[1400px] w-full mx-auto">
+        <div ref={contactoContentRef} className="max-w-[1400px] w-full mx-auto">
           <ScrollReveal>
             <div className="flex flex-col md:flex-row md:flex-wrap gap-6 md:gap-14 items-center justify-center">
               {/* WhatsApp */}
@@ -475,6 +473,15 @@ const HomePage = () => {
             </div>
           </ScrollReveal>
         </div>
+        {/* Al ser la última sección, el min-height de .snap-section (para que
+            ocupe una pantalla completa, como cualquier otra) deja espacio de
+            sobra debajo cuando los 5 íconos entran holgados en una pantalla
+            alta — y ese espacio vacío quedaba scrolleable, dejando "colgado"
+            un tramo por debajo del TikTok. Este marcador ancla el final real
+            del contenido con el fondo de la pantalla en ese caso. */}
+        {contactoEndTop !== null && (
+          <div className="snap-point absolute left-0 w-full pointer-events-none" style={{ top: `${contactoEndTop}px` }} />
+        )}
       </section>
 
       {/* Team Member Modal */}

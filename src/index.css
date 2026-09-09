@@ -91,23 +91,21 @@
     scroll-snap-stop: always;
   }
 
-  /* Same idea, but aligns its END with the bottom of the screen instead of
-     its start with the top — for marking "here is the true end of this
-     section's content" right where it borders the next one, so scrolling
-     through a long section snaps to fully showing its tail end instead of
-     leaving room for the next section to peek in underneath. */
-  .snap-point-end {
-    scroll-snap-align: end;
-    scroll-snap-stop: always;
-  }
-
-  /* Like .snap-section but without forcing min-height: 100vh — for the LAST
-     section on the page, where forcing a full-viewport height would leave
-     scrollable empty space below its own (shorter) content, since nothing
-     ever renders that trailing space. */
+  /* Same as .snap-section, but for the very LAST section on the page. Every
+     other section uses the "small viewport height" (100svh — the shortest
+     the browser's chrome can leave it, so a section's size never changes
+     mid-scroll and shifts its boundary with the next one). The last section
+     has no "next one" for that to protect, so here we want the opposite:
+     100dvh tracks the browser's ACTUAL current viewport as its UI chrome
+     shows/hides, so this section's height (and, with justify-center, how
+     much empty space surrounds its content) stays correct instead of being
+     pinned to the shortest-chrome case — which is what let you scroll past
+     the real end of the page into empty leftover space below it. */
   .snap-section-last {
     scroll-snap-align: start;
     scroll-snap-stop: always;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   /* Exactly one viewport tall, for content meant to stay pinned (position:
