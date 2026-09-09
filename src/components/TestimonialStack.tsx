@@ -81,9 +81,15 @@ const StackedCard = ({
         display,
         pointerEvents,
       }}
-      className="flex flex-col items-center justify-center px-6 md:px-12"
+      className="flex flex-col items-center justify-start px-6 md:px-12"
     >
-      <div className="max-w-xl w-full mx-auto relative z-10 mt-48 md:mt-40">
+      {/* Ancla arriba (justify-start) con un margen relativo al alto del
+          viewport, en vez de centrar y empujar con un margen fijo: así el
+          punto donde arranca la tarjeta (y el logo que sobresale -12 por
+          encima) no depende de cuánto texto tenga la reseña — la última
+          ("Raúl Andrés"), al ser más larga, empujaba la tarjeta hacia arriba
+          contra el título en pantallas más bajas (ej. algunas Mac). */}
+      <div className="max-w-xl w-full mx-auto relative z-10 mt-[34vh] md:mt-[38vh]">
         {/* Logo superpuesto rectangular */}
         <div className="absolute left-1/2 -top-12 -translate-x-1/2 w-48 h-24 bg-white rounded-2xl shadow-sm flex items-center justify-center z-20 overflow-hidden px-4">
           {testimonial.logo ? (

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 export interface ActiveSectionEntry {
   id: string;
-  theme: "light" | "dark";
+  theme: "light" | "dark" | "white";
 }
 
 /**

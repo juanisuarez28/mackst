@@ -8,6 +8,7 @@ import ClientCarousel from "@/components/ClientCarousel";
 import TestimonialStack from "@/components/TestimonialStack";
 import SectionBackgrounds from "@/components/SectionBackgrounds";
 import { useActiveSection } from "@/hooks/useActiveSection";
+import { useSectionTheme } from "@/hooks/useSectionTheme";
 
 const teamMembers = [
   {
@@ -143,16 +144,16 @@ const testimonials = [
 const SECTIONS = [
   { id: "inicio", theme: "light" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_claro_mack.svg')" },
   { id: "mision", theme: "dark" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
-  { id: "nosotros", theme: "light" as const, bgColorClass: "bg-secondary", bgImage: "url('/fondo_verde_claro_mack.svg')" },
-  { id: "clientes", theme: "dark" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
-  { id: "experiencia-0", theme: "dark" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
+  { id: "nosotros", theme: "white" as const, bgColorClass: "bg-secondary", bgImage: "url('/fondo_verde_claro_mack.svg')" },
+  { id: "clientes", theme: "white" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
+  { id: "experiencia-0", theme: "white" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
   { id: "servicios", theme: "light" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_claro_mack.svg')" },
-  { id: "contacto", theme: "light" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_verde_claro_mack.svg')" },
+  { id: "contacto", theme: "white" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_verde_claro_mack.svg')" },
 ];
 
 const ServicesSectionContent = ({ setSelectedService }: { setSelectedService: (i: number) => void }) => {
   return (
-    <div className="w-full px-6 md:px-12 py-16 md:py-24">
+    <div className="w-full px-6 md:px-12 pt-24 md:pt-28 pb-16 md:pb-24">
       <div className="max-w-[1400px] w-full mx-auto">
         <ScrollReveal>
           <h2
@@ -172,7 +173,7 @@ const ServicesSectionContent = ({ setSelectedService }: { setSelectedService: (i
                 style={{ background: "rgba(143, 157, 103, 0.05)" }}
               >
                 <div className="flex flex-col items-center justify-center">
-                  <h3 className="text-sm md:text-lg font-bold text-primary mb-0.5 uppercase tracking-widest leading-tight">
+                  <h3 className="text-sm md:text-lg font-bold text-secondary mb-0.5 uppercase tracking-widest leading-tight">
                     {service.name}
                   </h3>
                   <p className="text-[9px] md:text-xs text-foreground/60 leading-relaxed font-medium uppercase tracking-wide">
@@ -197,6 +198,7 @@ const HomePage = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useActiveSection(SECTIONS);
+  const sectionTheme = useSectionTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -240,7 +242,10 @@ const HomePage = () => {
           </ScrollReveal>
           <ScrollReveal delay={0.2}>
             <p className="text-base md:text-lg text-foreground/80 mt-8 max-w-2xl leading-relaxed">
-              Somos tu equipo estratégico de Agromarketing y Comunicación. Sabemos el esfuerzo que hay detrás de cada empresa, por eso queremos contar tu historia ayudándote a conectar con tu audiencia. Impulsamos tu marca y conectamos el Agro con las personas a través del marketing digital.
+              Somos tu equipo estratégico de Agromarketing y Comunicación. Sabemos el esfuerzo que hay detrás de cada empresa, por eso queremos contar tu historia ayudándote a conectar con tu audiencia.
+            </p>
+            <p className="text-base md:text-lg text-foreground/80 mt-4 max-w-2xl leading-relaxed">
+              Impulsamos tu marca y conectamos el Agro con las personas a través del marketing digital.
             </p>
           </ScrollReveal>
           <ScrollReveal delay={0.3}>
@@ -315,7 +320,7 @@ const HomePage = () => {
                     </div>
                     <h3 className="text-xs md:text-base font-bold text-secondary-foreground leading-tight">{member.name}</h3>
                     <p className="text-[9px] md:text-xs text-secondary-foreground/60 mt-0.5 md:mt-1 uppercase tracking-wider leading-relaxed">{member.role}</p>
-                    <p className="text-[9px] md:text-xs text-secondary-foreground/40 mt-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">Saber más →</p>
+                    <p className="text-[9px] md:text-xs text-secondary-foreground/40 mt-2">Saber más →</p>
                   </div>
                 </ScrollReveal>
               </div>
@@ -336,7 +341,7 @@ const HomePage = () => {
             >
               Nuestros clientes.
             </h2>
-            <p className="text-sm md:text-lg text-primary-foreground/70 max-w-xl leading-relaxed mb-10 md:mb-16">
+            <p className="text-sm md:text-lg text-white max-w-xl leading-relaxed mb-10 md:mb-16">
               Trabajamos con las principales empresas del sector agroindustrial, construyendo relaciones de confianza a largo plazo.
             </p>
           </ScrollReveal>
@@ -355,7 +360,13 @@ const HomePage = () => {
 
       <section
         id="servicios"
-        className="snap-section relative w-full flex flex-col justify-center items-center"
+        className="snap-section relative w-full flex flex-col items-center"
+        // "safe center" (vía style, no tiene clase Tailwind): centra igual
+        // que antes cuando el contenido entra en la pantalla, pero si es más
+        // alto que el viewport (título grande + grilla, en una pantalla baja
+        // tipo Mac) no lo desborda por arriba tapando el navbar — cae a
+        // alineado arriba en ese caso.
+        style={{ justifyContent: "safe center" }}
       >
         <ServicesSectionContent setSelectedService={setSelectedService} />
       </section>
@@ -490,7 +501,7 @@ const HomePage = () => {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-2xl bg-background rounded-[30px] md:rounded-[40px] shadow-2xl overflow-hidden border border-primary/20"
+              className="relative w-full max-w-2xl bg-white rounded-[30px] md:rounded-[40px] shadow-2xl overflow-hidden border border-primary/20"
             >
               <button
                 onClick={() => setSelectedService(null)}
@@ -507,7 +518,7 @@ const HomePage = () => {
                   <div className="h-px flex-1 bg-primary/10" />
                 </div>
 
-                <h3 className="text-2xl md:text-4xl font-black text-primary mb-4 md:mb-6 tracking-tighter leading-none uppercase">
+                <h3 className="text-2xl md:text-4xl font-black text-secondary mb-4 md:mb-6 tracking-tighter leading-none uppercase">
                   {servicesData[selectedService].name}
                 </h3>
 
@@ -519,8 +530,8 @@ const HomePage = () => {
                   <div className="grid md:grid-cols-2 gap-y-3 gap-x-8">
                     {servicesData[selectedService].bullets.map((bullet, idx) => (
                       <div key={idx} className="flex items-start gap-3">
-                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary mt-1.5 md:mt-2 flex-shrink-0" />
-                        <p className="text-[12px] md:text-sm font-bold text-foreground/70 uppercase tracking-wide">
+                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-secondary mt-1.5 md:mt-2 flex-shrink-0" />
+                        <p className="text-[12px] md:text-sm font-bold text-secondary uppercase tracking-wide">
                           {bullet}
                         </p>
                       </div>
@@ -539,7 +550,9 @@ const HomePage = () => {
         )}
       </AnimatePresence>
 
-      {/* Scroll to top button */}
+      {/* Scroll to top button — mismos tres temas que el Navbar, así el
+          ícono siempre contrasta contra el fondo de la sección en la que
+          estás, en vez de un color fijo que se perdía en algunos fondos. */}
       <AnimatePresence>
         {showScrollTop && (
           <motion.button
@@ -547,7 +560,11 @@ const HomePage = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.5, y: 20 }}
             onClick={scrollToTop}
-            className="fixed bottom-8 right-8 z-[80] w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-mack-olive shadow-xl hover:bg-white/20 transition-colors"
+            className={`fixed bottom-8 right-8 z-[80] w-12 h-12 rounded-full backdrop-blur-md border flex items-center justify-center shadow-xl transition-colors duration-500 ${
+              sectionTheme === "light"
+                ? "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"
+                : "bg-white/10 border-white/20 text-white hover:bg-white/20"
+            }`}
             aria-label="Subir"
           >
             <ArrowUp size={24} />

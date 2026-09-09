@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import { useSectionTheme } from "@/hooks/useSectionTheme";
 
 const navItems = [
   { label: "INICIO", target: "inicio" },
@@ -12,16 +13,10 @@ const navItems = [
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("inicio");
-  const [theme, setTheme] = useState("light"); // "light" or "dark" based on background
+  const theme = useSectionTheme();
 
   useEffect(() => {
-    // Escuchar el cambio de tema emitido por useActiveSection (HomePage)
-    const handleThemeChange = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      setTheme(customEvent.detail);
-    };
-
-    // Escuchar el cambio de sección activa, también emitido por useActiveSection
+    // Escuchar el cambio de sección activa, emitido por useActiveSection
     // (un IntersectionObserver en HomePage que sabe qué sección está centrada
     // en la pantalla). Algunas secciones (mision, experiencia-0) no tienen
     // botón propio en el navbar, así que se agrupan bajo el botón anterior
@@ -37,12 +32,8 @@ const Navbar = () => {
       }
     };
 
-    window.addEventListener("theme-change", handleThemeChange);
     window.addEventListener("section-change", handleSectionChange);
-    return () => {
-      window.removeEventListener("theme-change", handleThemeChange);
-      window.removeEventListener("section-change", handleSectionChange);
-    };
+    return () => window.removeEventListener("section-change", handleSectionChange);
   }, []);
 
   const scrollTo = (id: string) => {
@@ -53,20 +44,26 @@ const Navbar = () => {
     setMobileOpen(false);
   };
 
-  // Determine colors based on theme
-  const textColorClass = theme === "dark" ? "text-mack-cream" : "text-primary";
-  const hoverTextColorClass = theme === "dark" ? "hover:text-white" : "hover:text-primary/70";
-  const activeBgClass = theme === "dark" ? "bg-mack-cream text-primary" : "bg-primary text-primary-foreground";
+  // Determine colors based on theme. "white" is the same idea as "dark"
+  // (light text for a busy/colored background) but forced to pure white
+  // instead of cream, for sections where the designer wants more contrast.
+  const textColorClass = theme === "dark" ? "text-mack-cream" : theme === "white" ? "text-white" : "text-primary";
+  const hoverTextColorClass = theme === "dark" ? "hover:text-white" : theme === "white" ? "hover:text-white/70" : "hover:text-primary/70";
+  const activeBgClass = theme === "dark" ? "bg-mack-cream text-primary" : theme === "white" ? "bg-white text-primary" : "bg-primary text-primary-foreground";
+  // No hay un archivo de logo blanco puro: reutilizamos el logo beige y lo
+  // forzamos a blanco con un filtro (brightness-0 + invert), en vez de sumar
+  // un asset nuevo.
+  const logoFilterClass = theme === "white" ? "brightness-0 invert" : "";
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 transition-all duration-500 bg-transparent`}
     >
       <div className="flex items-center justify-between">
         <button onClick={() => scrollTo("inicio")} className="z-50">
-          <img 
-            src={theme === "dark" ? "/Logo-Beige-03.svg" : "/Logo-Dark-Green-03.svg"} 
-            alt="Mack Studio" 
-            className="h-8 md:h-10 w-auto object-contain transition-all duration-500"
+          <img
+            src={theme === "light" ? "/Logo-Dark-Green-03.svg" : "/Logo-Beige-03.svg"}
+            alt="Mack Studio"
+            className={`h-8 md:h-10 w-auto object-contain transition-all duration-500 ${logoFilterClass}`}
           />
         </button>
 
