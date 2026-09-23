@@ -45,6 +45,50 @@
       };
       window.addEventListener("load", forceScrollToTop);
       window.addEventListener("pageshow", forceScrollToTop);
+
+      // Respaldo extra SOLO para la recarga que dispara el botón de "subir"
+      // en mobile (ver scrollToTop en HomePage.tsx): reportado en un
+      // iPhone real que, pese a todo lo de arriba, la página seguía
+      // recargando en el mismo lugar en vez de en el hero. Esto dice que
+      // lo que sea que restaura el scroll en Safari actúa más tarde o más
+      // fuerte de lo que "load"/"pageshow" + reintentos con delay pueden
+      // cubrir. En vez de seguir adivinando CUÁNDO pasa eso, acá se
+      // cancela activamente cualquier scroll que se aleje de 0 durante los
+      // primeros segundos después de esa recarga puntual — no importa qué
+      // lo esté causando. HomePage.tsx deja esta marca en sessionStorage
+      // justo antes de navegar; si no está presente (cualquier otra carga
+      // normal de la página), esto no hace nada.
+      try {
+        if (sessionStorage.getItem("mackst:scrollToTopReload") === "1") {
+          sessionStorage.removeItem("mackst:scrollToTopReload");
+          // HomePage.tsx navega a esta misma URL con un parámetro "_top"
+          // agregado (para que Safari no tenga ninguna posición de scroll
+          // guardada asociada a ella) — lo saca de la barra de direcciones
+          // ahora que ya cumplió su propósito, sin disparar otra navegación.
+          if (window.location.search.indexOf("_top=") !== -1) {
+            var cleanUrl = new URL(window.location.href);
+            cleanUrl.searchParams.delete("_top");
+            window.history.replaceState(null, "", cleanUrl.toString());
+          }
+          var guardUntil = Date.now() + 3000;
+          var cancelDrift = function () {
+            if (Date.now() > guardUntil) {
+              window.removeEventListener("scroll", cancelDrift);
+              return;
+            }
+            if (window.scrollY !== 0) {
+              window.scrollTo(0, 0);
+            }
+          };
+          window.addEventListener("scroll", cancelDrift, { passive: true });
+          setTimeout(function () {
+            window.removeEventListener("scroll", cancelDrift);
+          }, 3000);
+        }
+      } catch (e) {
+        // sessionStorage puede fallar en navegación privada — no es
+        // crítico, el resto de las mitigaciones de arriba siguen en pie.
+      }
     </script>
     <link rel="icon" type="image/svg+xml" href="/Logo-Dark-Green-03.svg" />
     <title>Mack Studio (Mack St.) — Agromarketing & Comunicación</title>

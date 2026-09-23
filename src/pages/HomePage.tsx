@@ -330,15 +330,29 @@ const HomePage = () => {
     // que no hay forma de validar esa hipótesis sin un dispositivo real,
     // así que seguir ajustando a ciegas no converge.
     //
-    // En mobile, en vez de mover el scroll desde JS, se recarga la página
-    // directamente: index.html ya fuerza scroll a (0,0) en "load" y
-    // "pageshow" como respaldo del bug de recarga-arranca-en-Misión, así
-    // que una recarga entera SIEMPRE termina en el hero, sin tocar
-    // scroll-snap para nada — no hay ninguna interacción que pueda fallar.
-    // En desktop (donde nunca se reportó ningún problema) se mantiene la
-    // navegación de a una sección, más agradable que una recarga completa.
+    // En mobile, en vez de mover el scroll desde JS, se recarga la página.
+    // Primer intento: location.reload() liso y llano — reportado en un
+    // iPhone real que la página igual quedaba en el mismo lugar después de
+    // "recargar". Eso apunta a que Safari guarda la posición de scroll
+    // asociada a esa URL EXACTA y la reaplica después de que index.html ya
+    // hizo lo suyo (ver ahí el comentario sobre el resguardo con
+    // sessionStorage). Para evitar que tenga algo guardado que restaurar,
+    // se navega a una URL levemente distinta (mismo path, un parámetro
+    // nuevo) en vez de recargar la actual — nunca visitada antes, así que
+    // no hay ninguna posición previa asociada a ella. history.replace (no
+    // .href) para no ensuciar el botón "atrás" con estas variantes.
     if (isMobile) {
-      window.location.reload();
+      try {
+        sessionStorage.setItem("mackst:scrollToTopReload", "1");
+      } catch {
+        // sessionStorage puede fallar en navegación privada — el resto de
+        // esto sigue funcionando igual, solo sin el resguardo extra de
+        // index.html.
+      }
+      const url = new URL(window.location.href);
+      url.hash = "";
+      url.searchParams.set("_top", Date.now().toString());
+      window.location.replace(url.toString());
       return;
     }
 
