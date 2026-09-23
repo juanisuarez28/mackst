@@ -14,39 +14,39 @@ import { useEndSnapMarker } from "@/hooks/useEndSnapMarker";
 const teamMembers = [
   {
     name: "Constanza Mackrey",
-    role: "CEO - Marketing y Comunicación",
+    role: "CEO & Strategy Lead",
     image: "/Coni2.JPG",
-    bio: "Directora ejecutiva de Mack Studio. Comunicadora Social especializada en Marketing Digital y Agromarketing.\n\nLidera la agencia con una visión estratégica orientada a resultados, integrando comunicación, negocio y posicionamiento de marca. Su diferencial radica en el profundo conocimiento del sector agroindustrial, que le permite desarrollar estrategias alineadas al contexto y a las necesidades reales de cada cliente.\n\nSupervisa y acompaña cada proyecto desde una mirada integral, asegurando coherencia, impacto y una comunicación con sentido.",
+    bio: "Directora ejecutiva de Mack Studio. Comunicadora Social especializada en Marketing Digital y Agromarketing. Lidera la agencia con una visión estratégica orientada a resultados, integrando comunicación, negocio y posicionamiento de marca. Su diferencial radica en el profundo conocimiento del sector agroindustrial, asegurando coherencia, impacto y una comunicación con sentido.",
   },
   {
     name: "Belén Massigoge",
-    role: "Marketing y Redes Sociales",
+    role: "Content Specialist & Quality Control",
     image: "/Bele.JPG",
-    bio: "Especialista en estrategias de marketing digital y gestión de redes sociales, con foco en la planificación, ejecución y optimización de contenido.\n\nSe encarga de diseñar estrategias y gestionar la comunicación digital de nuestros clientes, creando contenidos alineados a cada marca y a sus objetivos. Su trabajo busca garantizar coherencia, consistencia y un crecimiento sostenido del alcance y la interacción en redes sociales.",
+    bio: "Especialista en planificación, gestión de redes sociales y control de calidad de contenidos. Se encarga de estructurar el enfoque comunicacional de las cuentas, el armado diario de contenidos para las redes sociales bajo lineamientos visuales y de supervisar, revisar y optimizar las planificaciones elaboradas por el equipo.",
   },
   {
     name: "Candela Montovi",
-    role: "Marketing y Redes Sociales",
+    role: "Content & Social Media Specialist",
     image: "/Cande.png",
-    bio: "Especialista en estrategias de marketing digital y gestión de redes sociales, con un enfoque orientado a la planificación, ejecución y optimización de contenidos.\n\nAcompaña a las marcas desde una mirada creativa y estratégica, desarrollando propuestas que generan valor y conexión real con sus audiencias. Su trabajo combina análisis, tendencias y creatividad para potenciar la presencia digital de cada cliente y lograr una comunicación coherente, efectiva y alineada a sus objetivos.",
+    bio: "Especialista en planificación y gestión de redes sociales. Se encarga de cranear contenidos creativos y alineados a las tendencias actuales bajo los lineamientos visuales de la agencia, manteniendo un contacto directo y fluido con los clientes de sus cuentas.",
   },
   {
     name: "Agostina Morey",
-    role: "Diseño Gráfico",
+    role: "Lead Designer & Brand Supervisor",
     image: "/agos.png",
-    bio: "Coordinadora del área de diseño gráfico de Mack Studio.\n\nResponsable de liderar y desarrollar la identidad visual de Mack Studio y de cada uno de sus clientes, asegurando coherencia, calidad y una estética alineada a la estrategia de comunicación.\n\nTrabaja en la conceptualización y creación de piezas visuales que reflejan la esencia de cada marca: desde el desarrollo de branding e identidad, hasta el diseño de contenidos para redes sociales, campañas digitales y materiales gráficos.\n\nSu enfoque combina creatividad y criterio estratégico, logrando que cada diseño no solo se vea bien, sino que comunique con claridad y propósito.",
+    bio: "Coordinadora del área de diseño gráfico de Mack Studio. Lidera y desarrolla la identidad visual de la agencia y sus clientes, asegurando calidad, coherencia estética y supervisando que todas las adaptaciones gráficas que se realizan cumplan con los lineamientos de marca.",
   },
   {
     name: "Sofia Presa",
-    role: "Comunicación Visual y Redes Sociales",
+    role: "Content & Social Media Specialist",
     image: "/sofia.jpg",
-    bio: "Se especializa en la creación de contenido visual y la gestión de redes sociales, combinando diseño y comunicación para desarrollar piezas atractivas y funcionales.\n\nAcompaña la ejecución diaria de los proyectos, diseñando contenidos para redes y adaptando cada pieza a la identidad de marca de nuestros clientes. Su trabajo aporta dinamismo, coherencia visual y rapidez en la producción de contenido, contribuyendo a una comunicación efectiva y consistente.",
+    bio: "Especialista en creación de contenido y gestión de redes sociales. Acompaña la ejecución diaria aportando dinamismo, agilidad y adaptando cada pieza a la identidad visual y comunicacional de los clientes.",
   },
   {
     name: "Juan Ignacio Suarez",
-    role: "Desarrollo Web",
+    role: "Web Developer",
     image: "/juaniprueba4.jpg",
-    bio: "Responsable del desarrollo de los proyectos digitales de Mack Studio, enfocado en crear sitios web modernos, funcionales y alineados a los objetivos de cada marca.\n\nDiseña y desarrolla plataformas optimizadas en rendimiento, asegurando una experiencia de usuario clara, ágil y profesional. Su trabajo garantiza que la presencia online de cada cliente no solo sea visualmente atractiva, sino también estratégica y efectiva.",
+    bio: "Responsable del desarrollo de los proyectos digitales de Mack Studio. Diseña y programa sitios web modernos, optimizados en rendimiento y enfocados en brindar una experiencia de usuario clara, ágil y estratégica.",
   },
 ];
 
