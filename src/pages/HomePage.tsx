@@ -558,7 +558,13 @@ const HomePage = () => {
 
               {/* Content */}
               <div className="flex-1 p-6 md:p-10 flex flex-col justify-center">
-                <p className="text-[10px] md:text-xs font-bold tracking-[0.4em] uppercase mb-2 text-primary/50">
+                {/* tracking mucho menor que en el resto de las etiquetas
+                    (tracking-[0.4em]) y font-size más chico en mobile: los
+                    roles en inglés son más largos ("Content Specialist &
+                    Quality Control") y con esos valores no entraban en una
+                    sola línea en pantallas angostas. whitespace-nowrap fuerza
+                    la línea única una vez que el tamaño ya entra. */}
+                <p className="text-[9px] md:text-xs font-bold tracking-[0.1em] md:tracking-[0.15em] uppercase mb-2 text-primary/50 whitespace-nowrap">
                   {teamMembers[selectedMember].role}
                 </p>
                 <h3 className="text-2xl md:text-4xl font-black text-primary leading-[0.9] mb-4">
