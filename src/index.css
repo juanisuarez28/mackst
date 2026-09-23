@@ -71,7 +71,21 @@
   }
 
   html {
-    scroll-behavior: smooth;
+    /* NO scroll-behavior: smooth acá (a propósito, se sacó): es una
+       propiedad AMBIENTE que se aplica a todo scroll cuyo behavior no se
+       especifica explícitamente, incluidos scrollTo({behavior:"auto"})
+       desde JS (donde "auto" significa "que decida el CSS", no
+       "instantáneo") y la propia restauración de posición de scroll del
+       navegador al recargar la página. Con scroll-snap-stop:always en cada
+       sección (más abajo), cualquier scroll continuo/animado que cruce
+       varias secciones de un salto tiene que frenar en cada una que
+       cruza — y en iOS Safari (no en Chrome) eso hacía que el botón de
+       "subir" y la restauración de scroll al recargar quedaran atrapados
+       en la primera sección que cruzaban en vez de llegar al destino real.
+       Cada scroll intencionalmente animado en este sitio (Navbar,
+       SectionDots, el botón "Descubrí más" del hero) ya pide "smooth" a
+       mano en su propio scrollIntoView — no dependen de esta propiedad
+       ambiente, así que sacarla no les cambia nada. */
     scroll-snap-type: y mandatory;
   }
 }

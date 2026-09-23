@@ -7,20 +7,41 @@
       // Safari (a diferencia de Chrome) restaura la posición de scroll
       // anterior al recargar la página, y con scroll-snap-type: mandatory
       // eso hacía que un reload arrancara en "Misión" en vez de en el hero.
-      // scrollRestoration = "manual" solo no alcanzó (reportado en un
-      // iPhone real, seguía pasando) — probablemente porque Safari restaura
-      // el scroll desde la bfcache al recargar, un mecanismo separado que
-      // esta propiedad no cubre. Como respaldo más contundente, se fuerza
-      // el scroll a 0 a mano en "load" (carga normal) y en "pageshow" (que
-      // sí dispara también en una restauración desde bfcache, a diferencia
-      // de "load"). El sitio no usa anclas de sección en la URL (no hay
-      // location.hash en ningún lado), así que forzar el tope en cada carga
-      // no rompe ningún link a una sección específica.
+      //
+      // Causa real (encontrada después de que scrollRestoration="manual" no
+      // alcanzara, reportado en un iPhone real): html tenía un
+      // "scroll-behavior: smooth" GLOBAL (ver index.css — se sacó), que se
+      // aplica a TODO scroll sin behavior explícito, incluida la propia
+      // restauración de scroll del navegador al recargar. Con
+      // scroll-snap-stop:always en cada sección, un scroll animado que
+      // intenta llegar a una posición profunda de la página tiene que
+      // frenar en cada sección que cruza — y Safari, en vez de ir
+      // frenando sección por sección, corta ahí y se queda en la primera
+      // ("Misión", justo después del hero). Eso explica por qué siempre
+      // frenaba ahí puntualmente y no en cualquier sección al azar.
+      //
+      // Con esa propiedad ambiente ya sacada, la restauración nativa
+      // debería volver a ser instantánea (sin nada que scroll-snap-stop
+      // pueda interceptar) — pero como no se pudo confirmar en un Safari
+      // real, esto se deja además como respaldo: fuerza el scroll a 0 a
+      // mano en "load" y "pageshow" (que además cubre una restauración
+      // desde bfcache, que "load" solo no dispara), y lo repite un par de
+      // veces más con un pequeño delay por si esa restauración nativa
+      // completa recién después de este primer intento. El sitio no usa
+      // anclas de sección en la URL (no hay location.hash en ningún lado),
+      // así que forzar el tope en cada carga no rompe ningún link a una
+      // sección específica.
       if ("scrollRestoration" in history) {
         history.scrollRestoration = "manual";
       }
       var forceScrollToTop = function () {
         window.scrollTo(0, 0);
+        setTimeout(function () {
+          window.scrollTo(0, 0);
+        }, 100);
+        setTimeout(function () {
+          window.scrollTo(0, 0);
+        }, 400);
       };
       window.addEventListener("load", forceScrollToTop);
       window.addEventListener("pageshow", forceScrollToTop);

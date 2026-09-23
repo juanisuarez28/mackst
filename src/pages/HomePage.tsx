@@ -306,29 +306,25 @@ const HomePage = () => {
     // scroll-snap-stop: always (used everywhere on the page — every section
     // boundary, every service item, every testimonial card) forces a
     // continuous/animated scroll to stop at every one it passes through.
-    // A "smooth" scroll from deep in the page kept getting caught on the
-    // way up — and toggling scroll-snap-type off mid-animation to work
-    // around it raced with the browser's own "scrollend" timing, so the
-    // button would jump to the top and then get snapped straight back to
-    // where it started. An INSTANT jump sidesteps this cleanly: it isn't a
-    // continuous scroll passing through intermediate snap points, it's a
-    // single relocation straight to y=0 — which is already "inicio"'s own
-    // valid snap point, so there's nothing left to correct afterward.
     //
-    // En iOS Safari se reportó que este botón, presionado repetidas veces
-    // desde el final de la página, se quedaba clavado ahí en vez de subir
-    // (probamos primero frenar el scroll a mano con overflow:hidden antes
-    // de saltar, para una inercia de swipe residual que Chrome no tiene —
-    // pero eso empeoró las cosas en vez de arreglarlas, así que se sacó).
-    // Lo que sigue en pie es: si Safari llega a "corregir" el salto
-    // instantáneo de vuelta al punto de snap donde estaba (scroll-snap-stop:
-    // always en cada sección hace que CUALQUIER scroll continuo se detenga
-    // en cada uno que cruza — y quizás interprete este salto como uno,
-    // pese a ser instantáneo), pedirlo de nuevo un instante después gana esa
-    // carrera. No tiene costo en los navegadores que no la necesitan: ya
-    // están en 0, así que volver a pedirlo no mueve nada.
-    window.scrollTo({ top: 0, behavior: "auto" });
-    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 60);
+    // The bug (reported repeatedly on iOS Safari, never on Chrome): this
+    // button would animate upward and then snap right back to where it
+    // started. The two previous fixes here — toggling scroll-snap-type off
+    // mid-animation, then later pausing with overflow:hidden before
+    // jumping — both assumed `behavior: "auto"` was already an instant
+    // jump, so the fight was about something else. It wasn't: `html` had a
+    // GLOBAL `scroll-behavior: smooth` (see index.css — now removed), and
+    // per spec `behavior: "auto"` means "let CSS decide", not "instant".
+    // So this was firing an actual smooth/continuous scroll the whole
+    // time, which is exactly what scroll-snap-stop:always intercepts —
+    // Safari, unlike Chrome, appears to enforce that strictly enough to
+    // cancel a long animated scroll back to its start rather than stepping
+    // through each section it crosses. `behavior: "instant"` sidesteps this
+    // for good: it's not a continuous scroll for anything to interrupt, it
+    // never depends on scroll-behavior, and it lands the page directly on
+    // y=0 — already "inicio"'s own valid snap point, so there's nothing
+    // left to correct afterward either way.
+    window.scrollTo({ top: 0, behavior: "instant" });
   };
 
   const handleCardClick = (i: number) => {
