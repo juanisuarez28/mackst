@@ -7,6 +7,8 @@ import ScrollReveal from "@/components/ScrollReveal";
 import ClientCarousel from "@/components/ClientCarousel";
 import TestimonialStack from "@/components/TestimonialStack";
 import SectionBackgrounds from "@/components/SectionBackgrounds";
+import SectionDots from "@/components/SectionDots";
+import ScrollProgressBar from "@/components/ScrollProgressBar";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { useSectionTheme } from "@/hooks/useSectionTheme";
 import { useEndSnapMarker } from "@/hooks/useEndSnapMarker";
@@ -138,18 +140,19 @@ const testimonials = [
 ];
 
 // Fuente única con la info de cada sección: qué tema (claro/oscuro) le
-// corresponde al Navbar, y qué fondo pinta SectionBackgrounds ahí — así los
-// fondos siempre están en el mismo orden/lista que usa la detección de
-// sección activa, sin repetir la data en dos lugares.
+// corresponde al Navbar, qué fondo pinta SectionBackgrounds ahí y qué label
+// muestra SectionDots — así todo eso siempre está en el mismo orden/lista
+// que usa la detección de sección activa, sin repetir la data en varios
+// lugares.
 // "experiencia-0" es el id del <TestimonialStack>, que ocupa una sola sección.
 const SECTIONS = [
-  { id: "inicio", theme: "light" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_claro_mack.svg')" },
-  { id: "mision", theme: "dark" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
-  { id: "nosotros", theme: "white" as const, bgColorClass: "bg-secondary", bgImage: "url('/fondo_verde_claro_mack.svg')" },
-  { id: "clientes", theme: "white" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
-  { id: "experiencia-0", theme: "white" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
-  { id: "servicios", theme: "light" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_claro_mack.svg')" },
-  { id: "contacto", theme: "white" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_verde_claro_mack.svg')" },
+  { id: "inicio", label: "Inicio", theme: "light" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_claro_mack.svg')" },
+  { id: "mision", label: "Misión", theme: "dark" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
+  { id: "nosotros", label: "Nosotros", theme: "white" as const, bgColorClass: "bg-secondary", bgImage: "url('/fondo_verde_claro_mack.svg')" },
+  { id: "clientes", label: "Clientes", theme: "white" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
+  { id: "experiencia-0", label: "Experiencias", theme: "white" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
+  { id: "servicios", label: "Servicios", theme: "light" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_claro_mack.svg')" },
+  { id: "contacto", label: "Contacto", theme: "white" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_verde_claro_mack.svg')" },
 ];
 
 const ServicesSectionContent = ({
@@ -243,6 +246,16 @@ const HomePage = () => {
   const [selectedMember, setSelectedMember] = useState<number | null>(null);
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  // Pista de "hay más abajo" en el hero (ver la sección "inicio"): visible
+  // solo mientras se está prácticamente en el tope de la página. Vuelve a
+  // aparecer si el usuario sube de nuevo hasta arriba del todo, igual que
+  // showScrollTop reaparece/desaparece según la posición de scroll.
+  const [showScrollHint, setShowScrollHint] = useState(true);
+  // "Empujoncito" visual a los 2s si nadie scrolleó todavía: un pequeño
+  // translateY en la sección entera (no un scroll real — un scroll real
+  // chocaría con scroll-snap-type:mandatory, igual que en el botón de
+  // subir) que sube y vuelve, simulando el gesto de scrollear.
+  const [nudge, setNudge] = useState(false);
 
   useActiveSection(SECTIONS);
   const sectionTheme = useSectionTheme();
@@ -258,9 +271,35 @@ const HomePage = () => {
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 300);
+      setShowScrollHint(window.scrollY < 40);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    // Primero a los 2s de cargar, y de ahí en más cada 3s: si a esa altura
+    // nadie scrolleó todavía (comprobado recién al disparar, no antes — así
+    // no hace falta cancelarlo a mano apenas el usuario se mueve), un
+    // empujoncito. Deja de insistir (clearInterval) apenas se detecta scroll,
+    // así no sigue picando de fondo una vez que ya se entendió la idea.
+    let intervalId: number | undefined;
+    const tryNudge = () => {
+      if (window.scrollY < 40) {
+        setNudge(true);
+        window.setTimeout(() => setNudge(false), 280);
+      } else if (intervalId !== undefined) {
+        window.clearInterval(intervalId);
+      }
+    };
+    const timer = window.setTimeout(() => {
+      tryNudge();
+      intervalId = window.setInterval(tryNudge, 3000);
+    }, 2000);
+    return () => {
+      window.clearTimeout(timer);
+      if (intervalId !== undefined) window.clearInterval(intervalId);
+    };
   }, []);
 
   const scrollToTop = () => {
@@ -290,10 +329,18 @@ const HomePage = () => {
     // cualquier sección — exactamente lo que borraba los fondos.
     <div>
       <SectionBackgrounds sections={SECTIONS} />
+      <SectionDots sections={SECTIONS} />
+      <ScrollProgressBar />
 
       <section
         id="inicio"
-        className="snap-section relative w-full flex flex-col justify-center items-center px-6 md:px-12 pt-24 pb-16"
+        // transform (a diferencia de un scroll real) no altera el cálculo
+        // de scroll-snap-align/scroll-snap-stop de esta sección, así que el
+        // nudge es puramente visual y no puede dejar el scroll real a mitad
+        // de camino como sí pasaría con un scrollTo.
+        className={`snap-section relative w-full flex flex-col justify-center items-center px-6 md:px-12 pt-24 pb-16 transition-transform duration-300 ease-out ${
+          nudge ? "-translate-y-10" : "translate-y-0"
+        }`}
       >
         <div className="max-w-[1400px] w-full mx-auto">
           <ScrollReveal>
@@ -320,6 +367,28 @@ const HomePage = () => {
             </p>
           </ScrollReveal>
         </div>
+
+        {/* Pista de scroll: sin esto, nada en el hero sugiere que hay más
+            secciones abajo. Desaparece apenas se scrollea (showScrollHint) y
+            reaparece si se vuelve al tope — mismo criterio que el botón de
+            subir, invertido.
+            Transición CSS en vez de framer-motion: al existir ya desde el
+            primer render (a diferencia del botón de subir, que recién se
+            monta cuando el usuario scrollea), su animación de entrada vía
+            motion/AnimatePresence quedaba pegada en opacity:0 — el mount
+            inicial de toda la página compite por el primer frame con el
+            montaje de este elemento. Una transición CSS simple no depende
+            de ese timing. */}
+        <button
+          onClick={() => document.getElementById("mision")?.scrollIntoView({ behavior: "smooth" })}
+          className={`absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-foreground/50 hover:text-foreground/80 transition-opacity duration-500 ${
+            showScrollHint ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+          aria-label="Scrolleá para descubrir más"
+        >
+          <span className="text-[10px] md:text-xs font-medium tracking-[0.15em] uppercase">Descubrí más</span>
+          <ChevronDown size={20} className="animate-bounce" />
+        </button>
       </section>
 
       <section
