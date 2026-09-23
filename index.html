@@ -7,11 +7,23 @@
       // Safari (a diferencia de Chrome) restaura la posición de scroll
       // anterior al recargar la página, y con scroll-snap-type: mandatory
       // eso hacía que un reload arrancara en "Misión" en vez de en el hero.
-      // Se desactiva lo antes posible, antes de que el navegador llegue a
-      // aplicarla — recién con el bundle ya sería tarde.
+      // scrollRestoration = "manual" solo no alcanzó (reportado en un
+      // iPhone real, seguía pasando) — probablemente porque Safari restaura
+      // el scroll desde la bfcache al recargar, un mecanismo separado que
+      // esta propiedad no cubre. Como respaldo más contundente, se fuerza
+      // el scroll a 0 a mano en "load" (carga normal) y en "pageshow" (que
+      // sí dispara también en una restauración desde bfcache, a diferencia
+      // de "load"). El sitio no usa anclas de sección en la URL (no hay
+      // location.hash en ningún lado), así que forzar el tope en cada carga
+      // no rompe ningún link a una sección específica.
       if ("scrollRestoration" in history) {
         history.scrollRestoration = "manual";
       }
+      var forceScrollToTop = function () {
+        window.scrollTo(0, 0);
+      };
+      window.addEventListener("load", forceScrollToTop);
+      window.addEventListener("pageshow", forceScrollToTop);
     </script>
     <link rel="icon" type="image/svg+xml" href="/Logo-Dark-Green-03.svg" />
     <title>Mack Studio (Mack St.) — Agromarketing & Comunicación</title>

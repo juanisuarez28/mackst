@@ -315,23 +315,20 @@ const HomePage = () => {
     // single relocation straight to y=0 — which is already "inicio"'s own
     // valid snap point, so there's nothing left to correct afterward.
     //
-    // En iOS Safari, si el dedo venía de soltar un swipe hace poco, el
-    // scroll todavía sigue moviéndose por inercia — y esa inercia, sumada
-    // al salto instantáneo de acá, podía "pelear" con el salto (a veces
-    // ganaba la inercia y el scroll volvía a bajar) o sumarse a él y
-    // terminar rebotando tan fuerte contra el tope que disparaba el gesto
-    // nativo de "pull to refresh" (recarga la página — ver overscroll-
-    // behavior-y en index.css, que ataja el resto de ese mismo gesto).
-    // Frenar el scroll a mano (overflow: hidden un instante) antes de saltar
-    // corta esa inercia. Chrome no tiene este problema, por eso ahí siempre
-    // funcionó bien.
-    const root = document.documentElement;
-    const previousOverflow = root.style.overflow;
-    root.style.overflow = "hidden";
+    // En iOS Safari se reportó que este botón, presionado repetidas veces
+    // desde el final de la página, se quedaba clavado ahí en vez de subir
+    // (probamos primero frenar el scroll a mano con overflow:hidden antes
+    // de saltar, para una inercia de swipe residual que Chrome no tiene —
+    // pero eso empeoró las cosas en vez de arreglarlas, así que se sacó).
+    // Lo que sigue en pie es: si Safari llega a "corregir" el salto
+    // instantáneo de vuelta al punto de snap donde estaba (scroll-snap-stop:
+    // always en cada sección hace que CUALQUIER scroll continuo se detenga
+    // en cada uno que cruza — y quizás interprete este salto como uno,
+    // pese a ser instantáneo), pedirlo de nuevo un instante después gana esa
+    // carrera. No tiene costo en los navegadores que no la necesitan: ya
+    // están en 0, así que volver a pedirlo no mueve nada.
     window.scrollTo({ top: 0, behavior: "auto" });
-    requestAnimationFrame(() => {
-      root.style.overflow = previousOverflow;
-    });
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 60);
   };
 
   const handleCardClick = (i: number) => {
