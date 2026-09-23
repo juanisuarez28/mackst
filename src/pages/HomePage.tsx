@@ -1,6 +1,6 @@
 import { Linkedin, Instagram, Send, X, ArrowUp, ChevronDown, Star } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState, useEffect, useRef, RefObject } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, RefObject } from "react";
 
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -155,10 +155,39 @@ const SECTIONS = [
 const ServicesSectionContent = ({
   setSelectedService,
   contentRef,
+  endTop,
 }: {
   setSelectedService: (i: number) => void;
   contentRef: RefObject<HTMLDivElement>;
+  endTop: number | null;
 }) => {
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  // Cuántos botones, contando desde el primero, siguen siendo parada de snap
+  // en mobile. Los que quedan pasado el marcador de fin de sección (endTop,
+  // ver useEndSnapMarker) dejan de serlo: ahí ya se vio toda la lista, y una
+  // parada más adelante solo dejaba el scroll clavado a mitad de camino con
+  // los íconos de contacto asomando debajo de los últimos servicios.
+  const [snapCount, setSnapCount] = useState(servicesData.length);
+
+  useLayoutEffect(() => {
+    const sectionEl = contentRef.current?.closest("section");
+    if (endTop === null || !sectionEl) {
+      setSnapCount(servicesData.length);
+      return;
+    }
+    // offsetTop (a diferencia de getBoundingClientRect) ignora el transform
+    // de la animación de ScrollReveal, que desplaza los botones mientras
+    // aparecen.
+    const topWithinSection = (el: HTMLElement) => {
+      let top = 0;
+      for (let node: HTMLElement | null = el; node && node !== sectionEl; node = node.offsetParent as HTMLElement | null) {
+        top += node.offsetTop;
+      }
+      return top;
+    };
+    setSnapCount(buttonRefs.current.filter((btn) => btn && topWithinSection(btn) <= endTop + 1).length);
+  }, [endTop, contentRef]);
+
   return (
     <div ref={contentRef} className="w-full px-6 md:px-12 pt-24 md:pt-28 pb-16 md:pb-24">
       <div className="max-w-[1400px] w-full mx-auto">
@@ -175,6 +204,9 @@ const ServicesSectionContent = ({
           {servicesData.map((service, i) => (
             <ScrollReveal key={i} delay={i * 0.05}>
               <button
+                ref={(el) => {
+                  buttonRefs.current[i] = el;
+                }}
                 onClick={() => setSelectedService(i)}
                 // max-md:snap-point: en mobile, la lista de 9 servicios es
                 // mucho más alta que una pantalla. Sin paradas intermedias,
@@ -182,8 +214,9 @@ const ServicesSectionContent = ({
                 // de snap "mandatory" del documento en ese tramo, así que un
                 // scroll con algo de impulso podía saltar directo a
                 // contacto sin llegar a mostrar los últimos servicios. Cada
-                // botón es ahora también una parada válida.
-                className="w-full text-left p-3 md:p-6 rounded-[20px] md:rounded-[25px] border border-primary/20 hover:border-primary transition-all duration-300 group flex flex-col items-center text-center min-h-[90px] md:min-h-[140px] justify-center relative shadow-sm max-md:snap-point"
+                // botón hasta el marcador de fin de sección (ver snapCount)
+                // es entonces también una parada válida.
+                className={`w-full text-left p-3 md:p-6 rounded-[20px] md:rounded-[25px] border border-primary/20 hover:border-primary transition-all duration-300 group flex flex-col items-center text-center min-h-[90px] md:min-h-[140px] justify-center relative shadow-sm ${i < snapCount ? "max-md:snap-point" : ""}`}
                 style={{ background: "rgba(143, 157, 103, 0.05)" }}
               >
                 <div className="flex flex-col items-center justify-center">
@@ -401,7 +434,11 @@ const HomePage = () => {
         // alineado arriba en ese caso.
         style={{ justifyContent: "safe center" }}
       >
-        <ServicesSectionContent setSelectedService={setSelectedService} contentRef={serviciosContentRef} />
+        <ServicesSectionContent
+          setSelectedService={setSelectedService}
+          contentRef={serviciosContentRef}
+          endTop={serviciosEndTop}
+        />
         {/* Marca el final real del contenido (ver useEndSnapMarker): sin
             esto, en mobile la lista de 9 servicios es más alta que la
             pantalla y el último punto de snap "válido" era el propio botón 9
