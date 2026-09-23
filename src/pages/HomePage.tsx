@@ -12,7 +12,6 @@ import ScrollProgressBar from "@/components/ScrollProgressBar";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { useSectionTheme } from "@/hooks/useSectionTheme";
 import { useEndSnapMarker } from "@/hooks/useEndSnapMarker";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const teamMembers = [
   {
@@ -260,7 +259,6 @@ const HomePage = () => {
 
   useActiveSection(SECTIONS);
   const sectionTheme = useSectionTheme();
-  const isMobile = useIsMobile();
 
   // Ver useEndSnapMarker: marca dónde termina el contenido real de cada
   // sección para que, al llegar ahí, se vea completo terminando justo al
@@ -270,10 +268,6 @@ const HomePage = () => {
   const contactoContentRef = useRef<HTMLDivElement>(null);
   const contactoEndTop = useEndSnapMarker(contactoContentRef);
 
-  // Ver scrollToTop: sube de a una sección por vez con setTimeout entre
-  // paso y paso, así que un segundo click mientras ya está en camino
-  // arrancaría una segunda secuencia superpuesta a la primera.
-  const isScrollingToTopRef = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -310,75 +304,43 @@ const HomePage = () => {
   }, []);
 
   const scrollToTop = () => {
-    // Historial de esta única función, por si hace falta retomarlo:
-    //   1. scrollTo behavior "auto"/"instant" — andaba en algunos
-    //      navegadores, en otros no.
-    //   2. Pausar con overflow:hidden antes de saltar — empeoró las cosas.
-    //   3. Apagar scroll-snap-type, saltar, reactivarlo un par de frames
-    //      después (con una lectura de layout en el medio para forzar que
-    //      el apagado ya esté aplicado) — funcionaba en Chrome de iPhone,
-    //      pero en Safari necesitaba un segundo click.
-    //   4. Subir de a una sección por vez (nunca cruzando más de un punto
-    //      de snap de un salto, el caso normal que scroll-snap maneja
-    //      bien en cualquier motor) — sin apagar scroll-snap-type en
-    //      ningún momento. Mejoró la frecuencia del fallo pero, reportado
-    //      de nuevo en un iPhone real, seguía pasando a veces: pantallazo
-    //      del hero y vuelta a la sección de origen.
-    // Cuatro intentos separados, cada uno con una hipótesis distinta sobre
-    // qué parte exacta de scroll-snap en WebKit/iOS estaba en conflicto, y
-    // ninguno lo resolvió del todo — la señal más honesta en este punto es
-    // que no hay forma de validar esa hipótesis sin un dispositivo real,
-    // así que seguir ajustando a ciegas no converge.
+    // Por qué es así (después de muchos intentos fallidos en iPhone):
+    // la especificación de CSS Scroll Snap pide que, ante un cambio de
+    // layout, el navegador vuelva a pegarse al MISMO elemento al que estaba
+    // pegado. WebKit (Safari, y también Chrome en iOS, que usa el mismo
+    // motor) recuerda en qué sección estabas, y un scroll hecho por código
+    // no siempre actualiza ese recuerdo. Resultado: el salto a 0 ocurre (se
+    // ve un pantallazo del hero), pero el primer cambio de layout que venga
+    // después (este botón desmontándose, el header cambiando de color, los
+    // marcadores de snap re-midiéndose...) hace que WebKit vuelva a pegarse
+    // a la sección vieja. Reactivar el snap a los N frames fallaba de forma
+    // intermitente porque dependía de si ese cambio de layout llegaba antes
+    // o después.
     //
-    // En mobile, en vez de mover el scroll desde JS, se recarga la página.
-    // Primer intento: location.reload() liso y llano — reportado en un
-    // iPhone real que la página igual quedaba en el mismo lugar después de
-    // "recargar". Eso apunta a que Safari guarda la posición de scroll
-    // asociada a esa URL EXACTA y la reaplica después de que index.html ya
-    // hizo lo suyo (ver ahí el comentario sobre el resguardo con
-    // sessionStorage). Para evitar que tenga algo guardado que restaurar,
-    // se navega a una URL levemente distinta (mismo path, un parámetro
-    // nuevo) en vez de recargar la actual — nunca visitada antes, así que
-    // no hay ninguna posición previa asociada a ella. history.replace (no
-    // .href) para no ensuciar el botón "atrás" con estas variantes.
-    if (isMobile) {
-      try {
-        sessionStorage.setItem("mackst:scrollToTopReload", "1");
-      } catch {
-        // sessionStorage puede fallar en navegación privada — el resto de
-        // esto sigue funcionando igual, solo sin el resguardo extra de
-        // index.html.
-      }
-      const url = new URL(window.location.href);
-      url.hash = "";
-      url.searchParams.set("_top", Date.now().toString());
-      window.location.replace(url.toString());
-      return;
-    }
+    // Por eso: se apaga el snap, se sube a 0, y el snap NO se vuelve a
+    // prender hasta que el usuario interactúe de nuevo (toque, rueda,
+    // teclado). Mientras está apagado no hay nada que pueda re-pegar la
+    // página a la sección vieja; cuando se prende, la página ya está en 0,
+    // así que queda pegada al hero. No depende de ningún timing.
+    const html = document.documentElement;
+    html.style.scrollSnapType = "none";
+    window.scrollTo(0, 0);
+    html.scrollTop = 0;
+    document.body.scrollTop = 0;
 
-    if (isScrollingToTopRef.current) return; // ignora un segundo click mientras ya está subiendo
-    const sectionEls = SECTIONS.map((s) => document.getElementById(s.id)).filter(
-      (el): el is HTMLElement => el !== null
-    );
-    if (sectionEls.length === 0) return;
-
-    const viewportCenter = window.innerHeight / 2;
-    let currentIndex = sectionEls.findIndex((el) => {
-      const rect = el.getBoundingClientRect();
-      return rect.top <= viewportCenter && rect.bottom >= viewportCenter;
-    });
-    if (currentIndex === -1) currentIndex = sectionEls.length - 1;
-
-    isScrollingToTopRef.current = true;
-    const stepUp = (index: number) => {
-      if (index < 0) {
-        isScrollingToTopRef.current = false;
-        return;
-      }
-      sectionEls[index].scrollIntoView({ behavior: "auto", block: "start" });
-      window.setTimeout(() => stepUp(index - 1), 150);
+    const restoreSnap = () => {
+      html.style.scrollSnapType = "";
+      window.removeEventListener("touchstart", restoreSnap);
+      window.removeEventListener("wheel", restoreSnap);
+      window.removeEventListener("keydown", restoreSnap);
     };
-    stepUp(currentIndex - 1);
+    // Se registra en el próximo frame para que el propio toque que disparó
+    // este click no lo reactive en el acto.
+    window.requestAnimationFrame(() => {
+      window.addEventListener("touchstart", restoreSnap, { passive: true });
+      window.addEventListener("wheel", restoreSnap, { passive: true });
+      window.addEventListener("keydown", restoreSnap);
+    });
   };
 
   const handleCardClick = (i: number) => {
