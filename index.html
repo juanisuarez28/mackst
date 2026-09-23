@@ -3,6 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Safari (a diferencia de Chrome) restaura la posición de scroll
+      // anterior al recargar la página, y con scroll-snap-type: mandatory
+      // eso hacía que un reload arrancara en "Misión" en vez de en el hero.
+      // Se desactiva lo antes posible, antes de que el navegador llegue a
+      // aplicarla — recién con el bundle ya sería tarde.
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+    </script>
     <link rel="icon" type="image/svg+xml" href="/Logo-Dark-Green-03.svg" />
     <title>Mack Studio (Mack St.) — Agromarketing & Comunicación</title>
     <meta name="description" content="Mack Studio (Mack St.) es una agencia de agromarketing y comunicación estratégica para el sector agroindustrial." />

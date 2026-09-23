@@ -147,7 +147,7 @@ const testimonials = [
 // "experiencia-0" es el id del <TestimonialStack>, que ocupa una sola sección.
 const SECTIONS = [
   { id: "inicio", label: "Inicio", theme: "light" as const, bgColorClass: "bg-background", bgImage: "url('/fondo_claro_mack.svg')" },
-  { id: "mision", label: "Misión", theme: "dark" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
+  { id: "mision", label: "Misión", theme: "white" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
   { id: "nosotros", label: "Nosotros", theme: "white" as const, bgColorClass: "bg-secondary", bgImage: "url('/fondo_verde_claro_mack.svg')" },
   { id: "clientes", label: "Clientes", theme: "white" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
   { id: "experiencia-0", label: "Experiencias", theme: "white" as const, bgColorClass: "bg-primary", bgImage: "url('/fondo_verde_oscuro_mack.svg')" },
@@ -314,7 +314,24 @@ const HomePage = () => {
     // continuous scroll passing through intermediate snap points, it's a
     // single relocation straight to y=0 — which is already "inicio"'s own
     // valid snap point, so there's nothing left to correct afterward.
+    //
+    // En iOS Safari, si el dedo venía de soltar un swipe hace poco, el
+    // scroll todavía sigue moviéndose por inercia — y esa inercia, sumada
+    // al salto instantáneo de acá, podía "pelear" con el salto (a veces
+    // ganaba la inercia y el scroll volvía a bajar) o sumarse a él y
+    // terminar rebotando tan fuerte contra el tope que disparaba el gesto
+    // nativo de "pull to refresh" (recarga la página — ver overscroll-
+    // behavior-y en index.css, que ataja el resto de ese mismo gesto).
+    // Frenar el scroll a mano (overflow: hidden un instante) antes de saltar
+    // corta esa inercia. Chrome no tiene este problema, por eso ahí siempre
+    // funcionó bien.
+    const root = document.documentElement;
+    const previousOverflow = root.style.overflow;
+    root.style.overflow = "hidden";
     window.scrollTo({ top: 0, behavior: "auto" });
+    requestAnimationFrame(() => {
+      root.style.overflow = previousOverflow;
+    });
   };
 
   const handleCardClick = (i: number) => {

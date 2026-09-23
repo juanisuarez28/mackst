@@ -58,6 +58,12 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Poppins', sans-serif;
+    /* En iOS Safari, un scroll rápido hacia arriba que rebota elásticamente
+       contra el tope de la página puede disparar el gesto nativo de "pull
+       to refresh", recargando el sitio — es lo que hacía que a veces el
+       botón de subir terminara recargando en vez de solo llevar al tope.
+       Chrome no tiene ese gesto, por eso ahí no pasaba. */
+    overscroll-behavior-y: none;
   }
 
   h1, h2, h3, h4, h5, h6 {
