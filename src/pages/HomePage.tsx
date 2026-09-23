@@ -268,6 +268,11 @@ const HomePage = () => {
   const contactoContentRef = useRef<HTMLDivElement>(null);
   const contactoEndTop = useEndSnapMarker(contactoContentRef);
 
+  // Ver scrollToTop: sube de a una sección por vez con setTimeout entre
+  // paso y paso, así que un segundo click mientras ya está en camino
+  // arrancaría una segunda secuencia superpuesta a la primera.
+  const isScrollingToTopRef = useRef(false);
+
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 300);
@@ -303,54 +308,57 @@ const HomePage = () => {
   }, []);
 
   const scrollToTop = () => {
-    // The bug, in every attempt so far: this button animates/jumps upward
-    // and then gets pulled right back to where it started. Three fixes
-    // tried before this one:
-    //   1. Toggling scroll-snap-type off mid-animation — raced with the
-    //      browser's own "scrollend" timing.
+    // Every previous attempt here tried to make a single LONG jump (straight
+    // from wherever the user is down to y=0) coexist with scroll-snap:
+    //   1. behavior "auto"/"instant" on window.scrollTo — worked on some
+    //      browsers, not others.
     //   2. Pausing with overflow:hidden before jumping — made it worse.
-    //   3. behavior: "instant" instead of "auto" (auto was quietly turning
-    //      into a smooth/continuous scroll because of a GLOBAL
-    //      scroll-behavior:smooth on html, since removed — see index.css).
-    // (3) was reported fixed, then broke again — and crucially, by then it
-    // was failing on iOS Chrome too, which had never happened before. iOS
-    // Chrome is not a different engine: every browser on iOS, Chrome
-    // included, is required to run on WebKit under the hood, so "only iOS
-    // browsers, any of them" points at WebKit's own scroll-snap handling
-    // of ANY js-driven reposition — not at "smooth vs instant", which
-    // Chrome-on-desktop's Blink engine clearly doesn't care about here.
+    //   3. Toggling scroll-snap-type off, jumping, toggling it back on a
+    //      frame or two later (with an offsetHeight read in between to force
+    //      the "off" to actually take effect first) — this got Chrome-on-iOS
+    //      working, but Safari itself still needed a second press (the
+    //      hero's background flashed for a frame — so the jump DID land —
+    //      then reverted). Adjusting the exact timing of that toggle then
+    //      made Chrome need a second press too.
+    // That last part is the tell: three rounds of adjusting *when* the
+    // toggle happens each shifted WHICH browser broke, rather than fixing
+    // either — which means the toggle-and-hope-the-timing-lands approach
+    // itself isn't reliable on WebKit (every browser on iOS, Chrome
+    // included, runs on WebKit — Apple doesn't allow a different engine),
+    // no matter how it's timed.
     //
-    // So instead of asking scroll-snap to accept this jump, this turns
-    // scroll-snap off for the moment it happens. scrollTop assignment is
-    // used instead of scrollTo/scrollIntoView so there's no "behavior"
-    // value of any kind for any engine to interpret — just a plain
-    // property write. Snap comes back on the frame after next, once the
-    // browser has definitely painted the new position with it off — one
-    // rAF alone was not trusted to guarantee that on iOS.
-    //
-    // That got Chrome-on-iOS working first try, but Safari itself needed a
-    // second press: on the first, the hero's background flashed for a
-    // frame (so the jump to 0 did happen) and then reverted to the section
-    // it started from; the second press then worked cleanly. That's the
-    // signature of a style change whose effect the engine hasn't actually
-    // applied yet at the moment the very next line runs — style writes are
-    // normally batched and only take effect on the following layout pass,
-    // and Safari appears to still be running that pass with snap counted
-    // as ON when scrollTop=0 lands, only picking up "off" a frame later
-    // (by which point the correction had already snapped it back). Reading
-    // a layout property forces the browser to flush that pending style
-    // change immediately instead of deferring it, so scrollSnapType:none
-    // is already in effect, not just "requested", before the scroll
-    // position changes.
-    const html = document.documentElement;
-    html.style.scrollSnapType = "none";
-    void html.offsetHeight; // force layout flush — see comment above
-    html.scrollTop = 0;
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        html.style.scrollSnapType = "";
-      });
+    // So instead of one long jump that has to skip over every mandatory
+    // snap point between here and the top, this steps up ONE section at a
+    // time — each step lands on the very next snap point up, never past
+    // it. That's exactly the case scroll-snap is designed to handle, on
+    // every engine, since it's what an ordinary upward swipe does too:
+    // nothing here is ever the "long jump crossing several mandatory stops
+    // at once" shape that every attempt above kept tripping over. No
+    // toggling scroll-snap-type at all, so there's no timing left to get
+    // wrong.
+    if (isScrollingToTopRef.current) return; // ignora un segundo click mientras ya está subiendo
+    const sectionEls = SECTIONS.map((s) => document.getElementById(s.id)).filter(
+      (el): el is HTMLElement => el !== null
+    );
+    if (sectionEls.length === 0) return;
+
+    const viewportCenter = window.innerHeight / 2;
+    let currentIndex = sectionEls.findIndex((el) => {
+      const rect = el.getBoundingClientRect();
+      return rect.top <= viewportCenter && rect.bottom >= viewportCenter;
     });
+    if (currentIndex === -1) currentIndex = sectionEls.length - 1;
+
+    isScrollingToTopRef.current = true;
+    const stepUp = (index: number) => {
+      if (index < 0) {
+        isScrollingToTopRef.current = false;
+        return;
+      }
+      sectionEls[index].scrollIntoView({ behavior: "auto", block: "start" });
+      window.setTimeout(() => stepUp(index - 1), 150);
+    };
+    stepUp(currentIndex - 1);
   };
 
   const handleCardClick = (i: number) => {
