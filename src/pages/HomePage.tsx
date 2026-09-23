@@ -16,37 +16,37 @@ const teamMembers = [
     name: "Constanza Mackrey",
     role: "CEO & Strategy Lead",
     image: "/Coni2.JPG",
-    bio: "Directora ejecutiva de Mack Studio. Comunicadora Social especializada en Marketing Digital y Agromarketing. Lidera la agencia con una visión estratégica orientada a resultados, integrando comunicación, negocio y posicionamiento de marca. Su diferencial radica en el profundo conocimiento del sector agroindustrial, asegurando coherencia, impacto y una comunicación con sentido.",
+    bio: "Directora ejecutiva de Mack Studio.\n\nComunicadora Social especializada en Marketing Digital y Agromarketing. Lidera la agencia con una visión estratégica orientada a resultados, integrando comunicación, negocio y posicionamiento de marca. Su diferencial radica en el profundo conocimiento del sector agroindustrial, asegurando coherencia, impacto y una comunicación con sentido.",
   },
   {
     name: "Belén Massigoge",
     role: "Content Specialist & Quality Control",
     image: "/Bele.JPG",
-    bio: "Especialista en planificación, gestión de redes sociales y control de calidad de contenidos. Se encarga de estructurar el enfoque comunicacional de las cuentas, el armado diario de contenidos para las redes sociales bajo lineamientos visuales y de supervisar, revisar y optimizar las planificaciones elaboradas por el equipo.",
+    bio: "Especialista en planificación, gestión de redes sociales y control de calidad de contenidos.\n\nSe encarga de estructurar el enfoque comunicacional de las cuentas, el armado diario de contenidos para las redes sociales bajo lineamientos visuales y de supervisar, revisar y optimizar las planificaciones elaboradas por el equipo.",
   },
   {
     name: "Candela Montovi",
     role: "Content & Social Media Specialist",
     image: "/Cande.png",
-    bio: "Especialista en planificación y gestión de redes sociales. Se encarga de cranear contenidos creativos y alineados a las tendencias actuales bajo los lineamientos visuales de la agencia, manteniendo un contacto directo y fluido con los clientes de sus cuentas.",
+    bio: "Especialista en planificación y gestión de redes sociales.\n\nSe encarga de cranear contenidos creativos y alineados a las tendencias actuales bajo los lineamientos visuales de la agencia, manteniendo un contacto directo y fluido con los clientes de sus cuentas.",
   },
   {
     name: "Agostina Morey",
     role: "Lead Designer & Brand Supervisor",
     image: "/agos.png",
-    bio: "Coordinadora del área de diseño gráfico de Mack Studio. Lidera y desarrolla la identidad visual de la agencia y sus clientes, asegurando calidad, coherencia estética y supervisando que todas las adaptaciones gráficas que se realizan cumplan con los lineamientos de marca.",
+    bio: "Coordinadora del área de diseño gráfico de Mack Studio.\n\nLidera y desarrolla la identidad visual de la agencia y sus clientes, asegurando calidad, coherencia estética y supervisando que todas las adaptaciones gráficas que se realizan cumplan con los lineamientos de marca.",
   },
   {
     name: "Sofia Presa",
     role: "Content & Social Media Specialist",
     image: "/sofia.jpg",
-    bio: "Especialista en creación de contenido y gestión de redes sociales. Acompaña la ejecución diaria aportando dinamismo, agilidad y adaptando cada pieza a la identidad visual y comunicacional de los clientes.",
+    bio: "Especialista en creación de contenido y gestión de redes sociales.\n\nAcompaña la ejecución diaria aportando dinamismo, agilidad y adaptando cada pieza a la identidad visual y comunicacional de los clientes.",
   },
   {
     name: "Juan Ignacio Suarez",
     role: "Web Developer",
     image: "/juaniprueba4.jpg",
-    bio: "Responsable del desarrollo de los proyectos digitales de Mack Studio. Diseña y programa sitios web modernos, optimizados en rendimiento y enfocados en brindar una experiencia de usuario clara, ágil y estratégica.",
+    bio: "Responsable del desarrollo de los proyectos digitales de Mack Studio.\n\nDiseña y programa sitios web modernos, optimizados en rendimiento y enfocados en brindar una experiencia de usuario clara, ágil y estratégica.",
   },
 ];
 
