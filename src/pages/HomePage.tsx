@@ -327,8 +327,24 @@ const HomePage = () => {
     // property write. Snap comes back on the frame after next, once the
     // browser has definitely painted the new position with it off — one
     // rAF alone was not trusted to guarantee that on iOS.
+    //
+    // That got Chrome-on-iOS working first try, but Safari itself needed a
+    // second press: on the first, the hero's background flashed for a
+    // frame (so the jump to 0 did happen) and then reverted to the section
+    // it started from; the second press then worked cleanly. That's the
+    // signature of a style change whose effect the engine hasn't actually
+    // applied yet at the moment the very next line runs — style writes are
+    // normally batched and only take effect on the following layout pass,
+    // and Safari appears to still be running that pass with snap counted
+    // as ON when scrollTop=0 lands, only picking up "off" a frame later
+    // (by which point the correction had already snapped it back). Reading
+    // a layout property forces the browser to flush that pending style
+    // change immediately instead of deferring it, so scrollSnapType:none
+    // is already in effect, not just "requested", before the scroll
+    // position changes.
     const html = document.documentElement;
     html.style.scrollSnapType = "none";
+    void html.offsetHeight; // force layout flush — see comment above
     html.scrollTop = 0;
     window.requestAnimationFrame(() => {
       window.requestAnimationFrame(() => {
