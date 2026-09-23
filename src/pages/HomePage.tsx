@@ -12,6 +12,7 @@ import ScrollProgressBar from "@/components/ScrollProgressBar";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { useSectionTheme } from "@/hooks/useSectionTheme";
 import { useEndSnapMarker } from "@/hooks/useEndSnapMarker";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const teamMembers = [
   {
@@ -259,6 +260,7 @@ const HomePage = () => {
 
   useActiveSection(SECTIONS);
   const sectionTheme = useSectionTheme();
+  const isMobile = useIsMobile();
 
   // Ver useEndSnapMarker: marca dónde termina el contenido real de cada
   // sección para que, al llegar ahí, se vea completo terminando justo al
@@ -308,34 +310,38 @@ const HomePage = () => {
   }, []);
 
   const scrollToTop = () => {
-    // Every previous attempt here tried to make a single LONG jump (straight
-    // from wherever the user is down to y=0) coexist with scroll-snap:
-    //   1. behavior "auto"/"instant" on window.scrollTo — worked on some
-    //      browsers, not others.
-    //   2. Pausing with overflow:hidden before jumping — made it worse.
-    //   3. Toggling scroll-snap-type off, jumping, toggling it back on a
-    //      frame or two later (with an offsetHeight read in between to force
-    //      the "off" to actually take effect first) — this got Chrome-on-iOS
-    //      working, but Safari itself still needed a second press (the
-    //      hero's background flashed for a frame — so the jump DID land —
-    //      then reverted). Adjusting the exact timing of that toggle then
-    //      made Chrome need a second press too.
-    // That last part is the tell: three rounds of adjusting *when* the
-    // toggle happens each shifted WHICH browser broke, rather than fixing
-    // either — which means the toggle-and-hope-the-timing-lands approach
-    // itself isn't reliable on WebKit (every browser on iOS, Chrome
-    // included, runs on WebKit — Apple doesn't allow a different engine),
-    // no matter how it's timed.
+    // Historial de esta única función, por si hace falta retomarlo:
+    //   1. scrollTo behavior "auto"/"instant" — andaba en algunos
+    //      navegadores, en otros no.
+    //   2. Pausar con overflow:hidden antes de saltar — empeoró las cosas.
+    //   3. Apagar scroll-snap-type, saltar, reactivarlo un par de frames
+    //      después (con una lectura de layout en el medio para forzar que
+    //      el apagado ya esté aplicado) — funcionaba en Chrome de iPhone,
+    //      pero en Safari necesitaba un segundo click.
+    //   4. Subir de a una sección por vez (nunca cruzando más de un punto
+    //      de snap de un salto, el caso normal que scroll-snap maneja
+    //      bien en cualquier motor) — sin apagar scroll-snap-type en
+    //      ningún momento. Mejoró la frecuencia del fallo pero, reportado
+    //      de nuevo en un iPhone real, seguía pasando a veces: pantallazo
+    //      del hero y vuelta a la sección de origen.
+    // Cuatro intentos separados, cada uno con una hipótesis distinta sobre
+    // qué parte exacta de scroll-snap en WebKit/iOS estaba en conflicto, y
+    // ninguno lo resolvió del todo — la señal más honesta en este punto es
+    // que no hay forma de validar esa hipótesis sin un dispositivo real,
+    // así que seguir ajustando a ciegas no converge.
     //
-    // So instead of one long jump that has to skip over every mandatory
-    // snap point between here and the top, this steps up ONE section at a
-    // time — each step lands on the very next snap point up, never past
-    // it. That's exactly the case scroll-snap is designed to handle, on
-    // every engine, since it's what an ordinary upward swipe does too:
-    // nothing here is ever the "long jump crossing several mandatory stops
-    // at once" shape that every attempt above kept tripping over. No
-    // toggling scroll-snap-type at all, so there's no timing left to get
-    // wrong.
+    // En mobile, en vez de mover el scroll desde JS, se recarga la página
+    // directamente: index.html ya fuerza scroll a (0,0) en "load" y
+    // "pageshow" como respaldo del bug de recarga-arranca-en-Misión, así
+    // que una recarga entera SIEMPRE termina en el hero, sin tocar
+    // scroll-snap para nada — no hay ninguna interacción que pueda fallar.
+    // En desktop (donde nunca se reportó ningún problema) se mantiene la
+    // navegación de a una sección, más agradable que una recarga completa.
+    if (isMobile) {
+      window.location.reload();
+      return;
+    }
+
     if (isScrollingToTopRef.current) return; // ignora un segundo click mientras ya está subiendo
     const sectionEls = SECTIONS.map((s) => document.getElementById(s.id)).filter(
       (el): el is HTMLElement => el !== null
