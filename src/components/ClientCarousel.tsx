@@ -2,23 +2,25 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 
 const clients = [
-  { name: "El Mingo", logo: "/clients/El-Mingo.png" },
-  { name: "MC Agroservicios", logo: "/clients/Logo-MCAgroservicios.png" },
-  { name: "Raul Andres", logo: "/clients/RaulAndres.png" },
-  { name: "AAT", logo: "/clients/aat.png" },
+  { name: "Agro Advance Technology", logo: "/clients/agro-advance-technology.png" },
   { name: "Agrowise", logo: "/clients/agrowise.png" },
-  { name: "Grow Padel", logo: "/clients/growpadel.png" },
-  { name: "Gym Best", logo: "/clients/gymbest.png" },
-  { name: "IT", logo: "/clients/it.svg" },
-  { name: "La Camisería", logo: "/clients/la_camiseria.JPG" },
-  { name: "Las Nazarenas", logo: "/clients/lasnazarenas.svg" },
-  { name: "LT", logo: "/clients/lt.png" },
-  { name: "SyG", logo: "/clients/syg.png" },
-  { name: "Vet San Jose", logo: "/clients/vet.sanjose.png" },
+  { name: "Atlas", logo: "/clients/atlas.png" },
+  { name: "Best Gim", logo: "/clients/best-gim.png" },
+  { name: "Brometan", logo: "/clients/brometan.png" },
+  { name: "EDM", logo: "/clients/edm.png" },
+  { name: "El Candil", logo: "/clients/el-candil.png" },
+  { name: "Grow Padel", logo: "/clients/grow-padel.png" },
+  { name: "IMEB", logo: "/clients/imeb.png" },
+  { name: "La Camisería", logo: "/clients/la-camiseria.png" },
+  { name: "Las Nazarenas", logo: "/clients/las-nazarenas.png" },
+  { name: "Lote", logo: "/clients/lote.png" },
+  { name: "MC Agroservicios", logo: "/clients/mc-agroservicios.png" },
+  { name: "Nuprofeed", logo: "/clients/nuprofeed.png" },
+  { name: "R. Andrés Inmobiliaria", logo: "/clients/r-andres-inmo.png" },
+  { name: "SyG Foods", logo: "/clients/syg-foods.png" },
+  { name: "Tenopapa", logo: "/clients/tenopapa.png" },
+  { name: "Vet. San José", logo: "/clients/vet-san-jose.png" },
   { name: "Vetifarma", logo: "/clients/vetifarma.png" },
-  { name: "Bianco", logo: "/clients/bianco.jpg" },
-  { name: "IMEB", logo: "/clients/imeb.jpg" }
-
 ];
 
 const ClientCarousel = () => {
