@@ -70,10 +70,10 @@ const ClientCarousel = () => {
           {clients.map((client, i) => (
             <div
               key={i}
-              className="shrink-0 px-4 md:px-8"
+              className="shrink-0 px-2 md:px-4"
               style={{ width: `${slideWidth}%` }}
             >
-              <div className="flex items-center justify-center h-24 md:h-36 group">
+              <div className="flex items-center justify-center h-32 md:h-48 group">
                 <img
                   src={client.logo}
                   alt={client.name}
