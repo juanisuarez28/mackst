@@ -17,39 +17,72 @@ const teamMembers = [
   {
     name: "Constanza Mackrey",
     role: "CEO & Strategy Lead",
-    image: "/Coni2.JPG",
+    photo: "/equipo/redondas/coni.webp",
+    photoSquare: "/equipo/cuadradas/coni.webp",
     bio: "Directora ejecutiva de Mack Studio.\n\nComunicadora Social especializada en Marketing Digital y Agromarketing. Lidera la agencia con una visión estratégica orientada a resultados, integrando comunicación, negocio y posicionamiento de marca. Su diferencial radica en el profundo conocimiento del sector agroindustrial, asegurando coherencia, impacto y una comunicación con sentido.",
   },
   {
     name: "Belén Massigoge",
     role: "Content Specialist & Quality Control",
-    image: "/Bele.JPG",
+    photo: "/equipo/redondas/bele.webp",
+    photoSquare: "/equipo/cuadradas/bele.webp",
     bio: "Especialista en planificación, gestión de redes sociales y control de calidad de contenidos.\n\nSe encarga de estructurar el enfoque comunicacional de las cuentas, el armado diario de contenidos para las redes sociales bajo lineamientos visuales y de supervisar, revisar y optimizar las planificaciones elaboradas por el equipo.",
+  },
+  {
+    name: "Milagros Alvarez",
+    role: "Content Strategist & Quality Control",
+    photo: "/equipo/redondas/mili.webp",
+    photoSquare: "/equipo/cuadradas/mili.webp",
+    bio: "Especialista en estrategia, planificación y control de calidad de contenidos.\n\nSe encarga de estructurar el enfoque comunicacional de las cuentas y de supervisar, revisar y optimizar las planificaciones elaboradas por el equipo, asegurando un estándar riguroso y alineación estratégica.",
   },
   {
     name: "Candela Montovi",
     role: "Content & Social Media Specialist",
-    image: "/Cande.png",
+    photo: "/equipo/redondas/cande.webp",
+    photoSquare: "/equipo/cuadradas/cande.webp",
     bio: "Especialista en planificación y gestión de redes sociales.\n\nSe encarga de cranear contenidos creativos y alineados a las tendencias actuales bajo los lineamientos visuales de la agencia, manteniendo un contacto directo y fluido con los clientes de sus cuentas.",
   },
   {
     name: "Agostina Morey",
     role: "Lead Designer & Brand Supervisor",
-    image: "/agos.png",
+    photo: "/equipo/redondas/agos.webp",
+    photoSquare: "/equipo/cuadradas/agos.webp",
     bio: "Coordinadora del área de diseño gráfico de Mack Studio.\n\nLidera y desarrolla la identidad visual de la agencia y sus clientes, asegurando calidad, coherencia estética y supervisando que todas las adaptaciones gráficas que se realizan cumplan con los lineamientos de marca.",
   },
   {
     name: "Sofia Presa",
     role: "Content & Social Media Specialist",
-    image: "/sofia.jpg",
+    photo: "/equipo/redondas/sofi.webp",
+    photoSquare: "/equipo/cuadradas/sofi.webp",
     bio: "Especialista en creación de contenido y gestión de redes sociales.\n\nAcompaña la ejecución diaria aportando dinamismo, agilidad y adaptando cada pieza a la identidad visual y comunicacional de los clientes.",
   },
   {
     name: "Juan Ignacio Suarez",
     role: "Web Developer",
-    image: "/juaniprueba4.jpg",
+    photo: "/equipo/redondas/juani.webp",
+    photoSquare: "/equipo/cuadradas/juani.webp",
     bio: "Responsable del desarrollo de los proyectos digitales de Mack Studio.\n\nDiseña y programa sitios web modernos, optimizados en rendimiento y enfocados en brindar una experiencia de usuario clara, ágil y estratégica.",
   },
+];
+
+// Posición de cada integrante en la grilla de "Nuestro equipo" (mismo orden
+// que teamMembers). Con 7 personas no hay fila pareja que quede simétrica:
+// - Mobile (grilla de 6 columnas, cada uno ocupa 2): filas de 2-3-2, las de
+//   2 corridas media tarjeta para quedar centradas entre las de 3.
+// - Tablet / desktop angosto (grilla de 8 columnas, cada uno ocupa 2): 4
+//   arriba y 3 abajo encajados entre los de arriba, en orden zigzag.
+// - Desktop ancho (xl): no usa esta tabla. Van los 7 en una sola fila y los
+//   de posición impar bajan (xl:mt-20 en el render) formando el zigzag; así
+//   la sección ocupa bastante menos alto que con dos filas completas.
+// Si cambia la cantidad de integrantes hay que rehacer esta tabla.
+const teamLayout = [
+  "col-start-2 row-start-1 md:col-start-1 md:row-start-1",
+  "col-start-4 row-start-1 md:col-start-2 md:row-start-2",
+  "col-start-1 row-start-2 md:col-start-3 md:row-start-1",
+  "col-start-3 row-start-2 md:col-start-4 md:row-start-2",
+  "col-start-5 row-start-2 md:col-start-5 md:row-start-1",
+  "col-start-2 row-start-3 md:col-start-6 md:row-start-2",
+  "col-start-4 row-start-3 md:col-start-7 md:row-start-1",
 ];
 
 const servicesData = [
@@ -263,6 +296,8 @@ const HomePage = () => {
   // Ver useEndSnapMarker: marca dónde termina el contenido real de cada
   // sección para que, al llegar ahí, se vea completo terminando justo al
   // fondo de la pantalla — nunca la sección siguiente asomando debajo.
+  const nosotrosContentRef = useRef<HTMLDivElement>(null);
+  const nosotrosEndTop = useEndSnapMarker(nosotrosContentRef);
   const serviciosContentRef = useRef<HTMLDivElement>(null);
   const serviciosEndTop = useEndSnapMarker(serviciosContentRef);
   const contactoContentRef = useRef<HTMLDivElement>(null);
@@ -457,29 +492,32 @@ const HomePage = () => {
 
       <section
         id="nosotros"
-        className="snap-section relative w-full flex flex-col justify-center items-center px-6 md:px-12 py-20"
+        className="snap-section relative w-full flex flex-col justify-center items-center px-6 md:px-12 py-16 md:py-20"
       >
-        <div className="max-w-[1400px] w-full mx-auto">
+        <div ref={nosotrosContentRef} className="max-w-[1400px] w-full mx-auto">
           <ScrollReveal>
             <h2
-              className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-10 md:mb-16"
+              className="font-bold text-secondary-foreground leading-[0.85] tracking-tight mb-8 md:mb-16 xl:mb-10"
               style={{ fontSize: "clamp(2rem, 10vw, 8rem)" }}
             >
               Nuestro equipo.
             </h2>
           </ScrollReveal>
-          <div className="flex flex-wrap justify-center gap-y-8 md:gap-10">
+          <div className="grid grid-cols-6 md:grid-cols-8 xl:grid-cols-7 gap-y-5 md:gap-y-4 max-w-5xl xl:max-w-none mx-auto">
             {teamMembers.map((member, i) => (
-              <div key={i} className="w-1/3 md:w-auto flex flex-col items-center px-1.5 md:px-0">
+              <div
+                key={i}
+                className={`col-span-2 xl:col-span-1 xl:col-start-auto xl:row-start-auto flex flex-col items-center px-1.5 md:px-2 ${teamLayout[i]} ${i % 2 ? "xl:mt-20" : ""}`}
+              >
                 <ScrollReveal delay={i * 0.08}>
                   <div
-                    className="flex flex-col items-center text-center cursor-pointer group w-full md:w-44"
+                    className="flex flex-col items-center text-center cursor-pointer group w-full md:max-w-44"
                     onClick={() => handleCardClick(i)}
                   >
-                    <div className="w-full aspect-square md:w-40 md:h-40 rounded-full overflow-hidden mb-3 md:mb-4 ring-4 ring-transparent group-hover:ring-secondary-foreground/40 transition-all duration-300 group-hover:scale-105 transform shadow-lg">
-                      <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                    <div className="w-full aspect-square md:w-32 md:h-32 lg:w-40 lg:h-40 rounded-full overflow-hidden mb-3 md:mb-4 ring-4 ring-transparent group-hover:ring-secondary-foreground/40 transition-all duration-300 group-hover:scale-105 transform shadow-lg">
+                      <img src={member.photo} alt={member.name} className="w-full h-full object-cover" />
                     </div>
-                    <h3 className="text-xs md:text-base font-bold text-secondary-foreground leading-tight">{member.name}</h3>
+                    <h3 className="text-xs md:text-base xl:text-sm 2xl:text-base font-bold text-secondary-foreground leading-tight">{member.name}</h3>
                     <p className="text-[9px] md:text-xs text-secondary-foreground/60 mt-0.5 md:mt-1 uppercase tracking-wider leading-relaxed">{member.role}</p>
                     <p className="text-[9px] md:text-xs text-secondary-foreground/40 mt-2">Saber más →</p>
                   </div>
@@ -488,6 +526,12 @@ const HomePage = () => {
             ))}
           </div>
         </div>
+        {/* Con 7 integrantes, en pantallas bajas (mobile en 2-3-2) la sección
+            queda más alta que el viewport: este marcador permite frenar con
+            la última fila completa a la vista (ver useEndSnapMarker). */}
+        {nosotrosEndTop !== null && (
+          <div className="snap-point absolute left-0 w-full pointer-events-none" style={{ top: `${nosotrosEndTop}px` }} />
+        )}
       </section>
 
       <section
@@ -644,7 +688,7 @@ const HomePage = () => {
               {/* Photo */}
               <div className="w-full md:w-[40%] h-64 md:h-auto relative flex-shrink-0 group">
                 <img
-                  src={teamMembers[selectedMember].image}
+                  src={teamMembers[selectedMember].photoSquare}
                   alt={teamMembers[selectedMember].name}
                   className="w-full h-full object-cover"
                 />
