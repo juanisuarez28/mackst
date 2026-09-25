@@ -685,8 +685,10 @@ const HomePage = () => {
             </button>
 
             <div className="flex flex-col md:flex-row min-h-[auto] md:min-h-[350px]">
-              {/* Photo */}
-              <div className="w-full md:w-[40%] h-64 md:h-auto relative flex-shrink-0 group">
+              {/* Photo — en mobile ocupa todo el ancho y va cuadrada como la
+                  foto original: con un alto fijo (h-64) se recortaba arriba y
+                  abajo y se veía con zoom. */}
+              <div className="w-full md:w-[40%] aspect-square md:aspect-auto md:h-auto relative flex-shrink-0 group">
                 <img
                   src={teamMembers[selectedMember].photoSquare}
                   alt={teamMembers[selectedMember].name}
