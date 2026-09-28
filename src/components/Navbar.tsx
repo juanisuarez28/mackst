@@ -21,14 +21,26 @@ const Navbar = () => {
     // en la pantalla). Algunas secciones (mision, experiencia-0) no tienen
     // botón propio en el navbar, así que se agrupan bajo el botón anterior
     // más cercano.
+    //
+    // La URL acompaña al botón activo (/nosotros, /servicios, etc.), así
+    // copiarla en cualquier punto da un link directo a esa sección (el
+    // salto al cargar lo hace el script de index.html). replaceState y no
+    // pushState para no llenar el historial con cada sección que se cruza.
     const handleSectionChange = (e: Event) => {
       const id = (e as CustomEvent).detail as string;
+      let target: string | null = null;
       if (navItems.some((item) => item.target === id)) {
-        setActiveSection(id);
+        target = id;
       } else if (id === "mision") {
-        setActiveSection("inicio");
+        target = "inicio";
       } else if (id.startsWith("experiencia-")) {
-        setActiveSection("clientes");
+        target = "clientes";
+      }
+      if (!target) return;
+      setActiveSection(target);
+      const path = target === "inicio" ? "/" : `/${target}`;
+      if (window.location.pathname !== path) {
+        window.history.replaceState(null, "", path + window.location.search);
       }
     };
 

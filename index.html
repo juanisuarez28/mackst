@@ -27,21 +27,29 @@
       // mano en "load" y "pageshow" (que además cubre una restauración
       // desde bfcache, que "load" solo no dispara), y lo repite un par de
       // veces más con un pequeño delay por si esa restauración nativa
-      // completa recién después de este primer intento. El sitio no usa
-      // anclas de sección en la URL (no hay location.hash en ningún lado),
-      // así que forzar el tope en cada carga no rompe ningún link a una
-      // sección específica.
+      // completa recién después de este primer intento.
+      //
+      // Excepción: las rutas de sección (/nosotros, /clientes, /servicios,
+      // /contacto) son links directos a esa sección, así que en vez del
+      // tope se salta ahí. Salto instantáneo, no smooth, por lo mismo de
+      // arriba: un scroll animado frena en la primera sección que cruza.
       if ("scrollRestoration" in history) {
         history.scrollRestoration = "manual";
       }
+      var SECTION_PATHS = ["nosotros", "clientes", "servicios", "contacto"];
+      var initialSection = window.location.pathname.replace(/^\/+|\/+$/g, "").toLowerCase();
+      var jumpToInitialPosition = function () {
+        var el = SECTION_PATHS.indexOf(initialSection) !== -1 ? document.getElementById(initialSection) : null;
+        if (el) {
+          el.scrollIntoView({ behavior: "instant", block: "start" });
+        } else {
+          window.scrollTo(0, 0);
+        }
+      };
       var forceScrollToTop = function () {
-        window.scrollTo(0, 0);
-        setTimeout(function () {
-          window.scrollTo(0, 0);
-        }, 100);
-        setTimeout(function () {
-          window.scrollTo(0, 0);
-        }, 400);
+        jumpToInitialPosition();
+        setTimeout(jumpToInitialPosition, 100);
+        setTimeout(jumpToInitialPosition, 400);
       };
       window.addEventListener("load", forceScrollToTop);
       window.addEventListener("pageshow", forceScrollToTop);
