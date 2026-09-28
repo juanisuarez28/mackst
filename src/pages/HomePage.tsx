@@ -546,9 +546,14 @@ const HomePage = () => {
             >
               Nuestros clientes.
             </h2>
-            <p className="text-sm md:text-lg text-white max-w-xl leading-relaxed mb-10 md:mb-16">
-              Trabajamos con las principales empresas del sector agroindustrial, construyendo relaciones de confianza a largo plazo.
-            </p>
+            <div className="text-sm md:text-lg text-white max-w-3xl leading-relaxed mb-10 md:mb-16 space-y-4">
+              <p>
+                Cada marca tiene su historia, sus desafíos y su manera de hacer las cosas.<br className="hidden md:block" /> Nos gusta conocerlas, involucrarnos y trabajar en equipo para construir una comunicación que las represente.
+              </p>
+              <p>
+                Acompañamos a empresas que nos abren sus puertas y confían en Mack<br className="hidden md:block" /> para ser parte de su crecimiento.
+              </p>
+            </div>
           </ScrollReveal>
 
           {/* Cartera de Clientes - Carousel */}
